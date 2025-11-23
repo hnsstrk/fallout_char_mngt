@@ -195,7 +195,7 @@ class CharacterSheetGenerator:
         return md
 
     def generate_skills(self) -> str:
-        """Generate skills section as table."""
+        """Generate skills section as table with descriptions."""
         items = self.character_data.get('items', [])
         skills = [item for item in items if item.get('type') == 'skill']
 
@@ -203,8 +203,8 @@ class CharacterSheetGenerator:
             return ""
 
         md = "## Skills\n\n"
-        md += "| Skill | Tag | Rank | Attribute |\n"
-        md += "|-------|-----|------|------------|\n"
+        md += "| Skill | Tag | Rank | Attribute | Description |\n"
+        md += "|-------|-----|------|-----------|-------------|\n"
 
         for skill in sorted(skills, key=lambda s: s.get('name', '')):
             name = skill.get('name', 'Unknown')
@@ -217,8 +217,12 @@ class CharacterSheetGenerator:
                 tag_value = tag_field.get('value', False) if isinstance(tag_field, dict) else False
             tag = "✓" if tag_value else ""
             attribute = skill.get('system', {}).get('defaultAttribute', '')
+            description = skill.get('system', {}).get('description', '')
 
-            md += f"| {name} | {tag} | {rank} | {attribute.upper() if attribute else ''} |\n"
+            # Clean description for table cell
+            desc_clean = self.strip_html(description) if description else ""
+
+            md += f"| {name} | {tag} | {rank} | {attribute.upper() if attribute else ''} | {desc_clean} |\n"
 
         md += "\n"
         return md

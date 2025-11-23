@@ -187,7 +187,7 @@ Character sheets are generated in Markdown format to `character_sheets/` directo
 1. **Header** - Name, Origin, Level, XP
 2. **S.P.E.C.I.A.L. Attributes** - Table with all 7 attributes
 3. **Derived Statistics** - Health, Defense, Initiative, Melee Damage, Carry Weight, Radiation
-4. **Skills** - Table with Tag, Rank, Attribute columns (compact format)
+4. **Skills** - Table with Tag, Rank, Attribute, Description columns
 5. **Body Status** - All 6 body parts with status, injuries, resistances
 6. **Perks** - Full descriptions and requirements
 7. **Trait** - Character trait with description
@@ -200,7 +200,7 @@ Character sheets are generated in Markdown format to `character_sheets/` directo
 14. **Data** - Character biography and background (from system.biography)
 
 **Important Design Decisions**:
-- **Skills** remain in compact table format for quick reference
+- **Skills** in table format with full descriptions included in table
 - **Addictions/Diseases** appear BEFORE Weapons for combat readiness check
 - **Ammunition** is part of Weapons section with full descriptions
 - **Consumables** show full descriptions (not table) for proper usage info
