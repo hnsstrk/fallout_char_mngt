@@ -451,6 +451,37 @@ class CharacterSheetGenerator:
         global_r = global_resistance.get('radiation', 0)
         global_po = global_resistance.get('poison', 0)
 
+        # Calculate resistances from equipped apparel for each body part
+        items = self.character_data.get('items', [])
+        apparel_items = [item for item in items if item.get('type') == 'apparel']
+
+        # Initialize equipment resistance tracking per body part
+        equipment_resistance = {
+            'head': {'physical': 0, 'energy': 0, 'radiation': 0, 'poison': 0},
+            'torso': {'physical': 0, 'energy': 0, 'radiation': 0, 'poison': 0},
+            'armL': {'physical': 0, 'energy': 0, 'radiation': 0, 'poison': 0},
+            'armR': {'physical': 0, 'energy': 0, 'radiation': 0, 'poison': 0},
+            'legL': {'physical': 0, 'energy': 0, 'radiation': 0, 'poison': 0},
+            'legR': {'physical': 0, 'energy': 0, 'radiation': 0, 'poison': 0}
+        }
+
+        # Sum up resistances from all equipped apparel
+        for item in apparel_items:
+            item_system = item.get('system', {})
+            if not item_system.get('equipped', False):
+                continue
+
+            resistance = item_system.get('resistance', {})
+            location = item_system.get('location', {})
+
+            # Apply this apparel's resistance to all covered body parts
+            for part_key, is_covered in location.items():
+                if is_covered and part_key in equipment_resistance:
+                    equipment_resistance[part_key]['physical'] += resistance.get('physical', 0)
+                    equipment_resistance[part_key]['energy'] += resistance.get('energy', 0)
+                    equipment_resistance[part_key]['radiation'] += resistance.get('radiation', 0)
+                    equipment_resistance[part_key]['poison'] += resistance.get('poison', 0)
+
         md = "## Body Status\n\n"
         md += "| Body Part | Status | Injuries | Resistances (P/E/R/Po) |\n"
         md += "|-----------|--------|----------|------------------------|\n"
@@ -474,12 +505,14 @@ class CharacterSheetGenerator:
             injuries_open = part.get('injuryOpenCount', 0)
             injuries_treated = part.get('injuryTreatedCount', 0)
 
-            # Combine body part resistances with global resistances
+            # Combine all three sources: body part + global + equipment
             part_resistance = part.get('resistance', {})
-            res_p = part_resistance.get('physical', 0) + global_p
-            res_e = part_resistance.get('energy', 0) + global_e
-            res_r = part_resistance.get('radiation', 0) + global_r
-            res_po = part_resistance.get('poison', 0) + global_po
+            equip_res = equipment_resistance[part_key]
+
+            res_p = part_resistance.get('physical', 0) + global_p + equip_res['physical']
+            res_e = part_resistance.get('energy', 0) + global_e + equip_res['energy']
+            res_r = part_resistance.get('radiation', 0) + global_r + equip_res['radiation']
+            res_po = part_resistance.get('poison', 0) + global_po + equip_res['poison']
 
             injury_str = f"{injuries_open} open, {injuries_treated} treated" if (injuries_open + injuries_treated) > 0 else "None"
 

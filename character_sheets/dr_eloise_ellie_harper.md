@@ -55,11 +55,11 @@
 | Body Part | Status | Injuries | Resistances (P/E/R/Po) |
 |-----------|--------|----------|------------------------|
 | Head | Healthy | None | 0/0/0/0 |
-| Torso | Healthy | None | 0/0/0/0 |
-| Left Arm | Healthy | None | 0/0/0/0 |
-| Right Arm | Healthy | None | 0/0/0/0 |
-| Left Leg | Healthy | None | 0/0/0/0 |
-| Right Leg | Healthy | None | 0/0/0/0 |
+| Torso | Healthy | None | 0/1/2/0 |
+| Left Arm | Healthy | None | 0/1/2/0 |
+| Right Arm | Healthy | None | 0/1/2/0 |
+| Left Leg | Healthy | None | 0/1/2/0 |
+| Right Leg | Healthy | None | 0/1/2/0 |
 
 ## Perks
 
@@ -256,5 +256,5 @@ temp: Gl&uuml;ck -2 am 09.04.25
 
 ---
 
-*Character sheet generated on 2025-11-23 16:18*
+*Character sheet generated on 2025-11-23 18:00*
 *Generated with [Fallout Character Management](https://github.com/hnsstrk/fallout_char_mngt)*
