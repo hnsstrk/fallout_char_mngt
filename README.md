@@ -32,7 +32,10 @@ fallout_char_mngt/
 │   ├── SOURCE.md                  # Licensing and attribution
 │   ├── README.md                  # Usage guide
 │   └── formulas.json              # Validated calculation formulas
+├── character_sheets/               # Generated character sheets (Markdown)
+│   └── *.md                       # Individual character sheets for offline use
 ├── analyze_character.py            # Character analyzer with derived stats calculation
+├── generate_character_sheet.py    # Character sheet generator (Markdown output)
 ├── extracted_fields.json           # Complete field inventory (2,167 fields)
 ├── FIELD_INVENTORY.md              # Human-readable field documentation (2,294 lines)
 ├── CLAUDE.md                       # Development guidance for Claude Code

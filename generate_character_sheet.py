@@ -274,15 +274,17 @@ class CharacterSheetGenerator:
         return md
 
     def generate_weapons(self) -> str:
-        """Generate weapons section."""
+        """Generate weapons section with ammunition."""
         items = self.character_data.get('items', [])
         weapons = [item for item in items if item.get('type') == 'weapon']
+        ammo = [item for item in items if item.get('type') == 'ammo']
 
-        if not weapons:
+        if not weapons and not ammo:
             return ""
 
         md = "## Weapons\n\n"
 
+        # Weapons
         for weapon in sorted(weapons, key=lambda w: w.get('name', '')):
             name = weapon.get('name', 'Unknown')
             system = weapon.get('system', {})
@@ -304,6 +306,17 @@ class CharacterSheetGenerator:
                 md += f"- **Qualities**: {self.strip_html(qualities)}\n"
             if effects:
                 md += f"- **Effects**: {self.strip_html(effects)}\n"
+            md += "\n"
+
+        # Ammunition
+        if ammo:
+            md += "### Ammunition\n\n"
+            md += "| Ammo Type | Quantity |\n"
+            md += "|-----------|----------|\n"
+            for item in sorted(ammo, key=lambda a: a.get('name', '')):
+                name = item.get('name', 'Unknown')
+                quantity = item.get('system', {}).get('quantity', 1)
+                md += f"| {name} | {quantity} |\n"
             md += "\n"
 
         return md
@@ -378,7 +391,7 @@ class CharacterSheetGenerator:
     def generate_gear(self) -> str:
         """Generate miscellaneous gear section."""
         items = self.character_data.get('items', [])
-        misc_items = [item for item in items if item.get('type') in ['miscellany', 'books_and_magz', 'ammo']]
+        misc_items = [item for item in items if item.get('type') in ['miscellany', 'books_and_magz']]
 
         if not misc_items:
             return ""
@@ -391,9 +404,7 @@ class CharacterSheetGenerator:
             quantity = item.get('system', {}).get('quantity', 1)
             description = item.get('system', {}).get('description', '')
 
-            if item_type == 'ammo':
-                md += f"- **{name}** (x{quantity}) - Ammunition\n"
-            elif item_type == 'books_and_magz':
+            if item_type == 'books_and_magz':
                 md += f"- **{name}** - Book/Magazine"
                 if description:
                     md += f": {self.strip_html(description)[:100]}"
@@ -456,15 +467,31 @@ class CharacterSheetGenerator:
         md += "\n"
         return md
 
-    def generate_biography(self) -> str:
-        """Generate character biography section."""
+    def generate_addictions(self) -> str:
+        """Generate addictions section."""
+        # In FVTT, addictions might be tracked in system.addictions or as items
+        # For now, create placeholder section
+        md = "## Addictions\n\n"
+        md += "*None*\n\n"
+        return md
+
+    def generate_diseases(self) -> str:
+        """Generate diseases section."""
+        # In FVTT, diseases might be tracked in system.diseases or as items
+        # For now, create placeholder section
+        md = "## Diseases\n\n"
+        md += "*None*\n\n"
+        return md
+
+    def generate_data(self) -> str:
+        """Generate character data section (biography, background info)."""
         system = self.character_data.get('system', {})
         biography = system.get('biography', '')
 
         if not biography:
             return ""
 
-        md = "## Character Biography\n\n"
+        md = "## Data\n\n"
         md += self.format_description(biography) + "\n\n"
 
         return md
@@ -475,14 +502,16 @@ class CharacterSheetGenerator:
         md += self.generate_special_attributes()
         md += self.generate_derived_stats()
         md += self.generate_skills()
+        md += self.generate_body_status()  # Moved after skills
         md += self.generate_perks()
         md += self.generate_trait()
-        md += self.generate_weapons()
+        md += self.generate_weapons()  # Now includes ammunition
         md += self.generate_apparel()
         md += self.generate_consumables()
-        md += self.generate_gear()
-        md += self.generate_body_status()
-        md += self.generate_biography()
+        md += self.generate_gear()  # No longer includes ammunition
+        md += self.generate_addictions()  # New section
+        md += self.generate_diseases()  # New section
+        md += self.generate_data()  # Renamed from biography
 
         # Footer
         md += "---\n\n"
@@ -508,9 +537,13 @@ class CharacterSheetGenerator:
         print(f"\nGenerating character sheet...")
         sheet = self.generate_character_sheet()
 
-        # Save
+        # Save to character_sheets/ directory
+        output_dir = Path('character_sheets')
+        output_dir.mkdir(exist_ok=True)
+
         safe_name = self.character_name.lower().replace(' ', '_').replace('.', '').replace("'", '')
-        output_file = Path(f"character_sheet_{safe_name}.md")
+        output_file = output_dir / f"{safe_name}.md"
+
         with open(output_file, 'w', encoding='utf-8') as f:
             f.write(sheet)
 

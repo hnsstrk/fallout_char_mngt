@@ -50,6 +50,17 @@
 | Throwing |  | 1 | AGI |
 | Unarmed |  | 1 | STR |
 
+## Body Status
+
+| Body Part | Status | Injuries | Resistances (P/E/R/Po) |
+|-----------|--------|----------|------------------------|
+| Head | Healthy | None | 0/0/0/0 |
+| Torso | Healthy | None | 0/0/0/0 |
+| Left Arm | Healthy | None | 0/0/0/0 |
+| Right Arm | Healthy | None | 0/0/0/0 |
+| Left Leg | Healthy | None | 0/0/0/0 |
+| Right Leg | Healthy | None | 0/0/0/0 |
+
 ## Perks
 
 ### Chemist
@@ -97,6 +108,12 @@ You may also work with the Gamemaster to determine what sort of experiment took 
 
 - **Damage**: 2 ()
 - **Range**: close
+
+### Ammunition
+
+| Ammo Type | Quantity |
+|-----------|----------|
+| 10mm Round | 10 |
 
 ## Apparel
 
@@ -155,7 +172,6 @@ Vault Jumpsuit: Insulated Lining, Treated Lining, Resistant Lining, Protective L
 
 ## Gear & Miscellany
 
-- **10mm Round** (x10) - Ammunition
 - **Apotheker von Gestern Band I** - Book/Magazine
 - **Desinfektionsmittel**
 - **Doctor's Bag**: A well-stocked bag of medical supplies and useful tools for the science of healing. A bit cumbersome...
@@ -165,18 +181,15 @@ Vault Jumpsuit: Insulated Lining, Treated Lining, Resistant Lining, Protective L
 - **Pip-Boy**: A Personal Information Processor manufactured by RobCo Industries. Under partnership with Vault-Tec,...
 - **Wasseraufbereitungstabletten** (x12)
 
-## Body Status
+## Addictions
 
-| Body Part | Status | Injuries | Resistances (P/E/R/Po) |
-|-----------|--------|----------|------------------------|
-| Head | Healthy | None | 0/0/0/0 |
-| Torso | Healthy | None | 0/0/0/0 |
-| Left Arm | Healthy | None | 0/0/0/0 |
-| Right Arm | Healthy | None | 0/0/0/0 |
-| Left Leg | Healthy | None | 0/0/0/0 |
-| Right Leg | Healthy | None | 0/0/0/0 |
+*None*
 
-## Character Biography
+## Diseases
+
+*None*
+
+## Data
 
 Allgemeine Informationen
 Geburtstag: 08.04.2254
@@ -191,5 +204,5 @@ temp: Gl&uuml;ck -2 am 09.04.25
 
 ---
 
-*Character sheet generated on 2025-11-23 14:37*
+*Character sheet generated on 2025-11-23 15:01*
 *Generated with [Fallout Character Management](https://github.com/hnsstrk/fallout_char_mngt)*

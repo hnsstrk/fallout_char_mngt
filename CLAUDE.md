@@ -94,7 +94,10 @@ fallout_char_mngt/
 │   ├── SOURCE.md                  # Licensing and attribution information
 │   ├── README.md                  # Usage guide for reference data
 │   └── formulas.json              # Validated calculation formulas for derived statistics
+├── character_sheets/               # Generated character sheets (Markdown)
+│   └── *.md                       # Individual character sheets for offline use
 ├── analyze_character.py            # Character JSON analyzer with derived stats calculation
+├── generate_character_sheet.py    # Character sheet generator (Markdown output)
 ├── extracted_fields.json           # Complete field inventory (2,167 fields) with calculations
 ├── FIELD_INVENTORY.md              # Human-readable categorized field documentation (2,294 lines)
 ├── CLAUDE.md                       # This file - guidance for Claude Code
@@ -172,6 +175,35 @@ The `reference_data/` directory contains extracted formulas and reference inform
 **Source**: Extracted from [FVTT Fallout System code](https://github.com/Muttley/foundryvtt-fallout/blob/main/system/src/documents/FalloutActor.mjs) and Fallout 2d20 Rulebook.
 
 **License**: See `reference_data/SOURCE.md` for attribution and licensing information. For personal/group offline play only.
+
+## Generated Character Sheets
+
+Character sheets are generated in Markdown format to `character_sheets/` directory.
+
+**File naming**: `{character_name}.md` (lowercase, underscores, no special chars)
+- Example: `dr_eloise_ellie_harper.md`
+
+**Character Sheet Structure** (in order):
+1. **Header** - Name, Origin, Level, XP
+2. **S.P.E.C.I.A.L. Attributes** - Table with all 7 attributes
+3. **Derived Statistics** - Health, Defense, Initiative, Melee Damage, Carry Weight, Radiation
+4. **Skills** - Table with Tag, Rank, Attribute columns
+5. **Body Status** - All 6 body parts with status, injuries, resistances
+6. **Perks** - Full descriptions and requirements
+7. **Trait** - Character trait with description
+8. **Weapons** - Weapon stats + Ammunition table
+9. **Apparel** - Locations covered, resistances, descriptions
+10. **Consumables** - Table with quantities and effects
+11. **Gear & Miscellany** - Books, misc items (no ammunition)
+12. **Addictions** - Placeholder section (*None* if empty)
+13. **Diseases** - Placeholder section (*None* if empty)
+14. **Data** - Character biography and background (from system.biography)
+
+**Important Design Decisions**:
+- Ammunition is part of **Weapons** section (not Gear)
+- Body Status appears after **Skills** (early in sheet for quick reference)
+- Addictions and Diseases have placeholder sections even when empty
+- "Data" section (not "Biography") matches FVTT DATA tab naming
 
 ## System Information
 
