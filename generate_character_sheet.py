@@ -444,6 +444,13 @@ class CharacterSheetGenerator:
         if not body_parts:
             return ""
 
+        # Get global resistances (e.g., from Supermutant origin)
+        global_resistance = system.get('resistance', {})
+        global_p = global_resistance.get('physical', 0)
+        global_e = global_resistance.get('energy', 0)
+        global_r = global_resistance.get('radiation', 0)
+        global_po = global_resistance.get('poison', 0)
+
         md = "## Body Status\n\n"
         md += "| Body Part | Status | Injuries | Resistances (P/E/R/Po) |\n"
         md += "|-----------|--------|----------|------------------------|\n"
@@ -467,11 +474,12 @@ class CharacterSheetGenerator:
             injuries_open = part.get('injuryOpenCount', 0)
             injuries_treated = part.get('injuryTreatedCount', 0)
 
-            resistance = part.get('resistance', {})
-            res_p = resistance.get('physical', 0)
-            res_e = resistance.get('energy', 0)
-            res_r = resistance.get('radiation', 0)
-            res_po = resistance.get('poison', 0)
+            # Combine body part resistances with global resistances
+            part_resistance = part.get('resistance', {})
+            res_p = part_resistance.get('physical', 0) + global_p
+            res_e = part_resistance.get('energy', 0) + global_e
+            res_r = part_resistance.get('radiation', 0) + global_r
+            res_po = part_resistance.get('poison', 0) + global_po
 
             injury_str = f"{injuries_open} open, {injuries_treated} treated" if (injuries_open + injuries_treated) > 0 else "None"
 
