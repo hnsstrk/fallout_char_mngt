@@ -9,7 +9,6 @@ Validates FVTT Fallout character JSON exports for:
 
 Usage:
     python validate_character.py <character_json_file>
-    python validate_character.py --all  # Validate all characters in fvtt_export/
 """
 
 import json
@@ -427,73 +426,24 @@ class CharacterValidator:
         return total_issues == 0
 
 
-def validate_all_characters(export_dir: Path):
-    """Validate all character files in the export directory."""
-    character_files = sorted(export_dir.glob('fvtt-Actor-*.json'))
-
-    if not character_files:
-        print(f"No character files found in {export_dir}")
-        return
-
-    print(f"\n{'='*70}")
-    print(f"Validating {len(character_files)} character file(s)")
-    print(f"{'='*70}\n")
-
-    results = []
-
-    for char_file in character_files:
-        validator = CharacterValidator(char_file)
-        validator.run_validation()
-        validator.print_report()
-
-        total_issues = len(validator.schema_errors) + len(validator.health_warnings) + len(validator.completeness_issues)
-        results.append((char_file.name, validator.character_name, total_issues))
-
-    # Print summary table
-    print(f"\n{'='*70}")
-    print("Validation Summary")
-    print(f"{'='*70}\n")
-    print(f"{'Character':<30} {'File':<30} {'Issues':>8}")
-    print("-" * 70)
-
-    for filename, char_name, issues in results:
-        status = "✅" if issues == 0 else "⚠️ "
-        # Truncate long names
-        display_name = char_name[:28] + ".." if len(char_name) > 30 else char_name
-        display_file = filename[:28] + ".." if len(filename) > 30 else filename
-        print(f"{status} {display_name:<28} {display_file:<28} {issues:>6}")
-
-    print(f"\n{'='*70}\n")
-
-
 def main():
     if len(sys.argv) < 2:
         print("Usage: python validate_character.py <character_json_file>")
-        print("       python validate_character.py --all  # Validate all characters")
         print("\nExample:")
-        print("  python validate_character.py fvtt_export/fvtt-Actor-marcel-O44zYNGmMfYtSjVw.json")
-        print("  python validate_character.py --all")
+        print("  python validate_character.py fvtt_export/fvtt-Actor-character-name-ABC123XYZ.json")
         sys.exit(1)
 
-    if sys.argv[1] == '--all':
-        export_dir = Path('fvtt_export')
-        if not export_dir.exists():
-            print(f"Error: Directory not found: {export_dir}")
-            sys.exit(1)
+    character_file = Path(sys.argv[1])
 
-        validate_all_characters(export_dir)
-    else:
-        character_file = Path(sys.argv[1])
+    if not character_file.exists():
+        print(f"Error: File not found: {character_file}")
+        sys.exit(1)
 
-        if not character_file.exists():
-            print(f"Error: File not found: {character_file}")
-            sys.exit(1)
+    validator = CharacterValidator(character_file)
+    validator.run_validation()
+    success = validator.print_report()
 
-        validator = CharacterValidator(character_file)
-        validator.run_validation()
-        success = validator.print_report()
-
-        sys.exit(0 if success else 1)
+    sys.exit(0 if success else 1)
 
 
 if __name__ == '__main__':

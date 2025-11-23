@@ -58,12 +58,6 @@ Before generating character sheets, you can validate your character JSON exports
 python validate_character.py fvtt_export/your-character-file.json
 ```
 
-Or validate all characters at once:
-
-```bash
-python validate_character.py --all
-```
-
 **Example:**
 ```bash
 python validate_character.py "fvtt_export/fvtt-Actor-character-name-ABC123XYZ.json"
