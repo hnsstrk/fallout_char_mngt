@@ -50,13 +50,6 @@ python generate_character_sheet.py "fvtt_export/fvtt-Actor-dr.-eloise-'ellie'-ha
 
 Output: `character_sheets/dr_eloise_ellie_harper.md`
 
-### Analyzing Characters (Optional)
-
-To analyze a character and view derived statistics without generating a full sheet:
-
-```bash
-python analyze_character.py fvtt_export/your-character-file.json
-```
 
 ## Generated Character Sheet Contents
 
@@ -126,8 +119,8 @@ fallout_char_mngt/
 ├── fvtt_export/                    # Place your exported JSON files here
 ├── character_sheets/               # Generated character sheets (Markdown)
 ├── reference_data/                 # Calculation formulas and attribution
-├── generate_character_sheet.py    # Main character sheet generator
-├── analyze_character.py            # Character analyzer (optional)
+├── generate_character_sheet.py    # Character sheet generator
+├── CLAUDE.md                       # Development guidance
 └── README.md                       # This file
 ```
 
@@ -159,9 +152,9 @@ See [`reference_data/SOURCE.md`](./reference_data/SOURCE.md) for complete attrib
 ## Development Status
 
 **Phase 1: Analysis** ✅ COMPLETED
-- All data fields identified and documented
-- Calculation formulas validated
-- Field inventory extracted (2,167 fields)
+- All data fields identified and analyzed (2,167 fields)
+- Calculation formulas validated and implemented
+- Character sheet structure designed
 
 **Phase 2: Implementation** ✅ COMPLETED
 - Character sheet generator functional
@@ -178,8 +171,7 @@ See [`reference_data/SOURCE.md`](./reference_data/SOURCE.md) for complete attrib
 This project uses **Claude Code** for development assistance.
 
 Developer documentation:
-- [`CLAUDE.md`](./CLAUDE.md) - Development guidance
-- [`FIELD_INVENTORY.md`](./FIELD_INVENTORY.md) - Complete field documentation
+- [`CLAUDE.md`](./CLAUDE.md) - Development guidance and project overview
 
 ## License & Attribution
 

@@ -54,7 +54,7 @@ If data exists in character JSONs, we don't extract it here to:
 
 ## Usage
 
-The character sheet generator (`analyze_character.py` and future tools) will:
+The character sheet generator (`generate_character_sheet.py`) will:
 
 1. **Primary source**: Character JSON files (complete character state)
 2. **Reference source**: This directory (formulas, validation, lookups)

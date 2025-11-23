@@ -29,28 +29,11 @@ These comprehensive offline character sheets are essential because the group has
 
 The analysis phase systematically identified and documented all data fields available in FVTT character exports, with complete validation against reference screenshots.
 
-**Analysis Approach:**
-
-1. **Automated Field Extraction** - Python script analyzes JSON files
-   - `analyze_character.py` - Recursively extracts all JSON fields (2,167 fields total)
-   - **Calculates derived statistics** using validated formulas from `reference_data/formulas.json`
-   - Outputs `extracted_fields.json` (machine-readable complete field inventory with calculations)
-   - Outputs `FIELD_INVENTORY.md` (human-readable categorized tables with 20 categories)
-   - All calculations validated against reference character data
-
 **Analysis Results:**
-- **Primary Character**: Level 4 Character (Standard character type)
-- **Total Fields Extracted**: 2,167
-- **Total Items Analyzed**: 44 items across 9 types
-- **Item Types**: skill (17), perk (4), weapon (3), apparel (6), consumable (4), ammo (1), miscellany (7), books_and_magz (1), trait (1)
-
-**Derived Statistics Calculated & Validated:**
-- Max Health: 13 ✓ (END 4 + LCK 4 + (Level-1) 3 - Radiation 0 + bonus 0 + wellRested +2)
-- Defense: 1 ✓ (AGI 6 ≤ 8 → 1, +bonus 0)
-- Initiative: 14 ✓ (PER 8 + AGI 6 + bonus 0)
-- Melee Damage: 0 ✓ (STR 4 < 7 → 0, +bonus 0)
-- Carry Weight: 190 ✓ (150 + STR 4 × 10 + mod 0)
-- Next Level XP: 1000 ✓ ((5 × 4 / 2) × 100)
+- All data fields identified and categorized (2,167 fields total)
+- 9 item types analyzed: skill, perk, weapon, apparel, consumable, ammo, miscellany, books_and_magz, trait
+- All derived statistics formulas validated and implemented
+- Character sheet structure designed and implemented
 
 **Success Criteria - ALL ACHIEVED:**
 - ✅ All relevant character data fields identified (2,167 fields)
@@ -78,16 +61,13 @@ Refine output format, add PDF generation, styling, and layout optimization.
 fallout_char_mngt/
 ├── fvtt_export/                    # FoundryVTT character export files
 │   └── fvtt-Actor-*.json          # Individual character JSON exports (6 characters)
-├── reference_data/                 # Extracted reference data (formulas, lookups)
+├── reference_data/                 # Calculation formulas and attribution
 │   ├── SOURCE.md                  # Licensing and attribution information
 │   ├── README.md                  # Usage guide for reference data
 │   └── formulas.json              # Validated calculation formulas for derived statistics
 ├── character_sheets/               # Generated character sheets (Markdown)
 │   └── *.md                       # Individual character sheets for offline use
-├── analyze_character.py            # Character JSON analyzer with derived stats calculation
 ├── generate_character_sheet.py    # Character sheet generator (Markdown output)
-├── extracted_fields.json           # Complete field inventory (2,167 fields) with calculations
-├── FIELD_INVENTORY.md              # Human-readable categorized field documentation (2,294 lines)
 ├── CLAUDE.md                       # This file - guidance for Claude Code
 └── README.md                       # GitHub repository overview
 ```
