@@ -208,6 +208,71 @@ Character sheets are generated in Markdown format to `character_sheets/` directo
 - All items with descriptions show FULL text (no truncation)
 - "Data" section (not "Biography") matches FVTT DATA tab naming
 
+## Documentation Maintenance
+
+### README.md Update Protocol
+
+**IMPORTANT**: Before every commit, check if README.md needs to be updated.
+
+The README.md serves as the primary user-facing documentation and must accurately reflect:
+1. **Current project status** - Installation requirements, usage instructions
+2. **Tool capabilities** - What the tool does, what output to expect
+3. **Development phase** - Phase 1 (Analysis), Phase 2 (Implementation), Phase 3 (Enhancement)
+
+#### When to Update README.md
+
+Check and update README.md when ANY of the following occur:
+
+**Feature Changes:**
+- New command-line arguments added to scripts
+- New output formats supported
+- Character sheet structure changes
+- New sections added to generated sheets
+- Calculation formulas modified
+
+**Project Status Changes:**
+- Phase transitions (Analysis → Implementation → Enhancement)
+- Major milestones completed
+- New capabilities added
+- Requirements changed
+
+**Usage Changes:**
+- Installation steps modified
+- New dependencies added
+- Command syntax changed
+- File paths or naming conventions changed
+
+**Documentation Focus:**
+- README.md is for **users** - focus on practical usage
+- Remove specific character names/examples (keep generic)
+- Keep "Generated Character Sheet Contents" section up to date
+- Ensure examples work and reflect current command syntax
+
+#### Pre-Commit Checklist
+
+Before creating any commit:
+
+1. **Review changes**: What functionality was added/modified?
+2. **Check README.md**: Does it accurately describe current tool behavior?
+3. **Update if needed**: Modify sections that are now outdated
+4. **Verify examples**: Ensure command examples still work
+5. **Commit README.md**: Include README.md updates in the same commit if changed
+
+**Example commit workflow:**
+```bash
+# Make code changes
+# ... modify generate_character_sheet.py ...
+
+# Before committing, check README.md
+# Does it describe the new feature?
+# Do the examples still work?
+
+# If outdated, update README.md
+# Then commit both files together
+git add generate_character_sheet.py README.md
+git commit -m "Add feature X and update documentation"
+```
+
 ## System Information
 
 - **FoundryVTT Core**: Version 13.347-13.351
