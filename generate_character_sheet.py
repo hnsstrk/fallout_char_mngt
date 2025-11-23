@@ -554,7 +554,7 @@ class CharacterSheetGenerator:
         output_dir = Path('character_sheets')
         output_dir.mkdir(exist_ok=True)
 
-        safe_name = self.character_name.lower().replace(' ', '_').replace('.', '').replace("'", '')
+        safe_name = self.character_name.lower().replace(' ', '_').replace('.', '').replace("'", '').replace('"', '')
         output_file = output_dir / f"{safe_name}.md"
 
         with open(output_file, 'w', encoding='utf-8') as f:
