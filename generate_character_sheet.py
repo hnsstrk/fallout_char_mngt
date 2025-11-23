@@ -219,8 +219,12 @@ class CharacterSheetGenerator:
             attribute = skill.get('system', {}).get('defaultAttribute', '')
             description = skill.get('system', {}).get('description', '')
 
-            # Clean description for table cell
+            # Clean description for table cell - remove HTML and newlines
             desc_clean = self.strip_html(description) if description else ""
+            # Replace newlines with spaces to keep table intact
+            desc_clean = desc_clean.replace('\n', ' ').replace('\r', ' ')
+            # Remove multiple spaces
+            desc_clean = ' '.join(desc_clean.split())
 
             md += f"| {name} | {tag} | {rank} | {attribute.upper() if attribute else ''} | {desc_clean} |\n"
 
