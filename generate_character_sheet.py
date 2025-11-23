@@ -483,7 +483,7 @@ class CharacterSheetGenerator:
                     equipment_resistance[part_key]['poison'] += resistance.get('poison', 0)
 
         md = "## Body Status\n\n"
-        md += "| Body Part | Status | Injuries | Resistances (P/E/R/Po) |\n"
+        md += "| Body Part | Status | Injuries | Resistances (E/P/Po/R) |\n"
         md += "|-----------|--------|----------|------------------------|\n"
 
         part_names = {
@@ -516,7 +516,7 @@ class CharacterSheetGenerator:
 
             injury_str = f"{injuries_open} open, {injuries_treated} treated" if (injuries_open + injuries_treated) > 0 else "None"
 
-            md += f"| {name} | {status.capitalize()} | {injury_str} | {res_p}/{res_e}/{res_r}/{res_po} |\n"
+            md += f"| {name} | {status.capitalize()} | {injury_str} | {res_e}/{res_p}/{res_po}/{res_r} |\n"
 
         md += "\n"
         return md
