@@ -195,7 +195,7 @@ class CharacterSheetGenerator:
         return md
 
     def generate_skills(self) -> str:
-        """Generate skills section with descriptions."""
+        """Generate skills section as table."""
         items = self.character_data.get('items', [])
         skills = [item for item in items if item.get('type') == 'skill']
 
@@ -203,6 +203,8 @@ class CharacterSheetGenerator:
             return ""
 
         md = "## Skills\n\n"
+        md += "| Skill | Tag | Rank | Attribute |\n"
+        md += "|-------|-----|------|------------|\n"
 
         for skill in sorted(skills, key=lambda s: s.get('name', '')):
             name = skill.get('name', 'Unknown')
@@ -213,17 +215,12 @@ class CharacterSheetGenerator:
                 tag_value = tag_field
             else:
                 tag_value = tag_field.get('value', False) if isinstance(tag_field, dict) else False
-            tag = " (Tag)" if tag_value else ""
+            tag = "✓" if tag_value else ""
             attribute = skill.get('system', {}).get('defaultAttribute', '')
-            description = skill.get('system', {}).get('description', '')
 
-            md += f"### {name} - Rank {rank}{tag}\n\n"
-            if attribute:
-                md += f"**Attribute**: {attribute.upper()}\n\n"
+            md += f"| {name} | {tag} | {rank} | {attribute.upper() if attribute else ''} |\n"
 
-            if description:
-                md += f"{self.format_description(description)}\n\n"
-
+        md += "\n"
         return md
 
     def generate_perks(self) -> str:
@@ -319,13 +316,16 @@ class CharacterSheetGenerator:
         # Ammunition
         if ammo:
             md += "### Ammunition\n\n"
-            md += "| Ammo Type | Quantity |\n"
-            md += "|-----------|----------|\n"
+
             for item in sorted(ammo, key=lambda a: a.get('name', '')):
                 name = item.get('name', 'Unknown')
                 quantity = item.get('system', {}).get('quantity', 1)
-                md += f"| {name} | {quantity} |\n"
-            md += "\n"
+                description = item.get('system', {}).get('description', '')
+
+                md += f"**{name}** (x{quantity})\n\n"
+
+                if description:
+                    md += f"{self.format_description(description)}\n\n"
 
         return md
 
@@ -374,7 +374,7 @@ class CharacterSheetGenerator:
         return md
 
     def generate_consumables(self) -> str:
-        """Generate consumables section."""
+        """Generate consumables section with full descriptions."""
         items = self.character_data.get('items', [])
         consumables = [item for item in items if item.get('type') == 'consumable']
 
@@ -382,18 +382,20 @@ class CharacterSheetGenerator:
             return ""
 
         md = "## Consumables\n\n"
-        md += "| Item | Quantity | Effect |\n"
-        md += "|------|----------|--------|\n"
 
         for item in sorted(consumables, key=lambda c: c.get('name', '')):
             name = item.get('name', 'Unknown')
             quantity = item.get('system', {}).get('quantity', 1)
             description = item.get('system', {}).get('description', '')
-            desc_short = self.strip_html(description)[:80] + "..." if len(self.strip_html(description)) > 80 else self.strip_html(description)
 
-            md += f"| {name} | {quantity} | {desc_short} |\n"
+            md += f"### {name}"
+            if quantity > 1:
+                md += f" (x{quantity})"
+            md += "\n\n"
 
-        md += "\n"
+            if description:
+                md += f"{self.format_description(description)}\n\n"
+
         return md
 
     def generate_gear(self) -> str:
@@ -505,16 +507,16 @@ class CharacterSheetGenerator:
         md += self.generate_special_attributes()
         md += self.generate_derived_stats()
         md += self.generate_skills()
-        md += self.generate_body_status()  # Moved after skills
+        md += self.generate_body_status()
         md += self.generate_perks()
         md += self.generate_trait()
+        md += self.generate_addictions()  # Before weapons
+        md += self.generate_diseases()  # Before weapons
         md += self.generate_weapons()  # Now includes ammunition
         md += self.generate_apparel()
         md += self.generate_consumables()
-        md += self.generate_gear()  # No longer includes ammunition
-        md += self.generate_addictions()  # New section
-        md += self.generate_diseases()  # New section
-        md += self.generate_data()  # Renamed from biography
+        md += self.generate_gear()
+        md += self.generate_data()
 
         # Footer
         md += "---\n\n"

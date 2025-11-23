@@ -187,22 +187,25 @@ Character sheets are generated in Markdown format to `character_sheets/` directo
 1. **Header** - Name, Origin, Level, XP
 2. **S.P.E.C.I.A.L. Attributes** - Table with all 7 attributes
 3. **Derived Statistics** - Health, Defense, Initiative, Melee Damage, Carry Weight, Radiation
-4. **Skills** - Table with Tag, Rank, Attribute columns
+4. **Skills** - Table with Tag, Rank, Attribute columns (compact format)
 5. **Body Status** - All 6 body parts with status, injuries, resistances
 6. **Perks** - Full descriptions and requirements
 7. **Trait** - Character trait with description
-8. **Weapons** - Weapon stats + Ammunition table
-9. **Apparel** - Locations covered, resistances, descriptions
-10. **Consumables** - Table with quantities and effects
-11. **Gear & Miscellany** - Books, misc items (no ammunition)
-12. **Addictions** - Placeholder section (*None* if empty)
-13. **Diseases** - Placeholder section (*None* if empty)
+8. **Addictions** - Placeholder section (*None* if empty) - BEFORE weapons
+9. **Diseases** - Placeholder section (*None* if empty) - BEFORE weapons
+10. **Weapons** - Weapon stats with full descriptions + Ammunition with descriptions
+11. **Apparel** - Locations covered, resistances, full descriptions
+12. **Consumables** - Full descriptions with quantities (not table format)
+13. **Gear & Miscellany** - Books, misc items with full descriptions
 14. **Data** - Character biography and background (from system.biography)
 
 **Important Design Decisions**:
-- Ammunition is part of **Weapons** section (not Gear)
-- Body Status appears after **Skills** (early in sheet for quick reference)
-- Addictions and Diseases have placeholder sections even when empty
+- **Skills** remain in compact table format for quick reference
+- **Addictions/Diseases** appear BEFORE Weapons for combat readiness check
+- **Ammunition** is part of Weapons section with full descriptions
+- **Consumables** show full descriptions (not table) for proper usage info
+- **Body Status** appears after Skills (early in sheet for quick reference)
+- All items with descriptions show FULL text (no truncation)
 - "Data" section (not "Biography") matches FVTT DATA tab naming
 
 ## System Information

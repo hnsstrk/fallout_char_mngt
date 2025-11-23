@@ -30,124 +30,25 @@
 
 ## Skills
 
-### Athletics - Rank 1
-
-**Attribute**: STR
-
-Athletics describes your ability to apply your physical strength and agility, know your limits, but also how to focus during physical exertion.
-Its default S.P.E.C.I.A.L. attribute is Strength but it can also be used with Agility or Endurance when facing physical adversity. You might use Athletics when trying to push, pull, or lift objects, jump, climb, swim, or run.
-
-### Barter - Rank 1
-
-**Attribute**: CHA
-
-Barter describes your skill with money: how savvy you are with your wealth, how easily you can make deals, or how easily you can negotiate someone down on price.
-Its default S.P.E.C.I.A.L. attribute is Charisma but could also be used with Perception to see how willing someone might be to change their demands, or Intelligence to know the true caps value of something. You might use Barter trying to buy or sell items, or negotiate the cost of a service.
-
-### Big Guns - Rank 0
-
-**Attribute**: END
-
-Big Guns is the skill that describes the training to use large weapons, from Fat Mans to gatling lasers, and everything in between.
-Its default S.P.E.C.I.A.L. attribute is Endurance but could also be used with Strength when you need to brace a weapon, or Agility when precision matters. You use Big Guns with weapons like miniguns, rocket launchers, Fat Mans, and gatling lasers.
-
-### Energy Weapons - Rank 1
-
-**Attribute**: PER
-
-Energy Weapons is the skill to use any time you fire energy-based firearms like laser guns, plasma guns, gauss weaponry, and any other small arm that fires a bolt of energy.
-Its default S.P.E.C.I.A.L. attribute is Perception but could be used with Intelligence if you were trying to modify and repair an energy weapon, or Agility when you are trying to disarm a trap that uses an energy weapon. You use Energy Weapons with weapons like laser pistols, plasma rifles, the gauss rifle, the microwave emitter, or a laser musket.
-
-### Explosives - Rank 1
-
-**Attribute**: PER
-
-Whether you throw them, place them as a trap, or remotely detonate them, you use the Explosives skill with any kind of explosive device.
-Its default S.P.E.C.I.A.L. attribute is Perception but you can also use Strength to throw a grenade as far as you can, or Agility to try to get close to a mine without setting it off. You use Explosives with frag grenades and mines, Molotov cocktails, Nuka grenades, plasma grenades, pulse grenades, mines, and dynamite.
-
-### Lockpick - Rank 1
-
-**Attribute**: PER
-
-The Lockpick skill reflects your knowledge of manipulating physical locks and opening them without a key.
-Its default S.P.E.C.I.A.L. attribute is Perception but could be used with Agility, or Strength if you&rsquo;re trying to force a door open without breaking the lock. You might use Lockpick to break into a safe, or open a locked door.
-
-### Medicine - Rank 5 (Tag)
-
-**Attribute**: INT
-
-Medicine is the skill that covers all medical application and knowledge, from first aid to pharmacology, surgery, and healing radiation poisoning.
-Its default S.P.E.C.I.A.L. attribute is Intelligence, but you might use Agility to perform surgery, or Charisma to counsel a companion. You use Medicine to stabilize your companions in combat, and help heal their injuries.
-
-### Melee Weapons - Rank 1
-
-**Attribute**: STR
-
-The Melee Weapons skill describes how able you are to inflict damage and deflect blows with one-handed and two-handed melee weapons.
-Its default S.P.E.C.I.A.L. attribute is Strength but you might use Agility to parry a melee attack, or Charisma to threaten someone. You use Melee Weapons to make melee attacks in combat.
-
-### Pilot - Rank 1
-
-**Attribute**: PER
-
-The Pilot skill covers your ability to operate vehicles, from buggies and motorcycles, to Vertibirds and tanks.
-Its default S.P.E.C.I.A.L. attribute is Perception but you might use Strength to pull a buggy out of a skid, or Agility to land a Vertibird within a tight landing zone. You use Pilot to drive any ground vehicles, or pilot any flying vehicles.
-
-### Repair - Rank 4
-
-**Attribute**: INT
-
-Building and repairing items, from guns to buildings, simple traps to complex mechanisms, fall under the Repair skill.
-Its default S.P.E.C.I.A.L. attribute is Intelligence but you might use Strength to get some heavy machinery operating again, or Perception to investigate a problem with an engine. You use Repair to fix and modify weapons, repair robots, craft items from scratch, or build defenses.
-
-### Science - Rank 3 (Tag)
-
-**Attribute**: INT
-
-The Science skill covers academic and practical knowledge, but is practically applied in the wasteland through computer coding, robotic programming, and brewing chems.
-Its default S.P.E.C.I.A.L. attribute is Intelligence but you might use it with Perception to observe a test subject, or Charisma to convince people of something using your scientific knowledge. You use Science to hack computers, brew chems, and solve problems with science!
-
-### Small Guns - Rank 2
-
-**Attribute**: AGI
-
-The Small Guns skill describes your accuracy and working knowledge of single-shot and automatic pistols, rifles, and shotguns.
-Its default S.P.E.C.I.A.L. attribute is Agility but you might use it with Charisma to hold someone at gunpoint or Endurance to remain trained on a target. You use Small Guns to make ranged attacks in combat with pistols, rifles, and shotguns.
-
-### Sneak - Rank 2
-
-**Attribute**: AGI
-
-The Sneak skill covers stealthy movement and any physical actions you take not to be noticed.
-Its default S.P.E.C.I.A.L. attribute is Agility but you might use it with Perception to find enemies hiding in ambush, or Intelligence to case a building. You use Sneak to move silently or stay hidden.
-
-### Speech - Rank 3 (Tag)
-
-**Attribute**: CHA
-
-The Speech skill covers the techniques you&rsquo;ve learned to communicate with other people, convincing them with strong arguments, or lying to them and not getting caught.
-Its default S.P.E.C.I.A.L. attribute is Charisma but you might use it with Intelligence to write a speech, or Perception to figure out how susceptible your mark might be to your lie. You use Speech to convince people of your arguments, inspire others, or convincingly deceive them.
-
-### Survival - Rank 1
-
-**Attribute**: END
-
-The Survival skill covers all manner of practical bush craft, like hunting, foraging, fishing, building makeshift shelters, and lighting fires.
-Its default S.P.E.C.I.A.L. attribute is Endurance but you might also use it with Perception to figure out how long you have until nightfall, or Charisma to charm animals. You might use Survival to build a base camp, or test your resilience against malnourishment or dehydration.
-
-### Throwing - Rank 1
-
-**Attribute**: AGI
-
-The Throwing skill describes your ability to effectively make attacks with thrown weapons like javelins, knives, and improvised weapons.
-Its default S.P.E.C.I.A.L. attribute is Agility but you might also use Strength with heavy objects or Perception to judge distance. You use Throwing to make thrown attacks with specific weapons.
-
-### Unarmed - Rank 1
-
-**Attribute**: STR
-
-The Unarmed skill covers your ability to fight with your fists.
-Its default S.P.E.C.I.A.L. attribute is Strength but you might also use Agility, or Charisma when threatening or intimidating someone. You use the Unarmed skill to make unarmed attacks in combat.
+| Skill | Tag | Rank | Attribute |
+|-------|-----|------|------------|
+| Athletics |  | 1 | STR |
+| Barter |  | 1 | CHA |
+| Big Guns |  | 0 | END |
+| Energy Weapons |  | 1 | PER |
+| Explosives |  | 1 | PER |
+| Lockpick |  | 1 | PER |
+| Medicine | ✓ | 5 | INT |
+| Melee Weapons |  | 1 | STR |
+| Pilot |  | 1 | PER |
+| Repair |  | 4 | INT |
+| Science | ✓ | 3 | INT |
+| Small Guns |  | 2 | AGI |
+| Sneak |  | 2 | AGI |
+| Speech | ✓ | 3 | CHA |
+| Survival |  | 1 | END |
+| Throwing |  | 1 | AGI |
+| Unarmed |  | 1 | STR |
 
 ## Body Status
 
@@ -190,6 +91,14 @@ Requirements: INT 8, Level 2+
 Your healthier start to life at the hands of trained doctors and sophisticated auto-docs means you reduce the difficulty of all END tests to resist the effects of disease. In addition, your carefully-planned upbringing means you have one additional tag skill of your choice.
 You may also work with the Gamemaster to determine what sort of experiment took place within your Vault. Once per quest, the GM may introduce a complication which reflects the nature of the experiment you unwittingly took part in, or introduce a complication related to your early life of isolation and confinement within the Vault. If the GM does this, you immediately regain one Luck Point.
 
+## Addictions
+
+*None*
+
+## Diseases
+
+*None*
+
 ## Weapons
 
 ### 10mm Pistol
@@ -225,9 +134,10 @@ Switchblade: Serrated Blade
 
 ### Ammunition
 
-| Ammo Type | Quantity |
-|-----------|----------|
-| 10mm Round | 10 |
+**10mm Round** (x10)
+
+One of the most common types of pistol round found in the wastelands, manufactured in vast quantities before the Great War to accompany the large numbers of 10mm pistols they were producing as sidearms for soldiers, and as personal defense weapons for civilians.
+Quantity Found: [[/r 8+4dc # 10mm Round]]
 
 ## Apparel
 
@@ -277,12 +187,25 @@ Vault Jumpsuit: Insulated Lining, Treated Lining, Resistant Lining, Protective L
 
 ## Consumables
 
-| Item | Quantity | Effect |
-|------|----------|--------|
-| Mentats | 1 | Mentats were a popular recreational and performance-enhancing drug before the Gr... |
-| Purified Water | 1 | Water which has been cleansed of any contaminants or radiation. Sometimes found ... |
-| RadAway | 4 | An intravenous drug which purges radiation from the user&rsquo;s body, absorbing... |
-| Stimpak | 3 | A stimulation delivery package, or Stimpak, is a form of fast-acting medication ... |
+### Mentats
+
+Mentats were a popular recreational and performance-enhancing drug before the Great War, which enhance memory and speed mental processes. It was popular amongst students studying for exams, and amongst armchair philosophers and those in jobs requiring intensive thought. The effect lasts only a short time, leaving the user feeling tired and unfocused afterwards, and they are addictive by design, with withdrawal causing migraines and irritability.
+Mentat Addiction: A failed addiction roll renders you addicted to Mentats. You increase the difficulty of all CHA tests by +1 whenever you are not under the effects of a type of Mentat (ordinary Mentats, or the Berry, Grape, or Orange versions).
+
+### Purified Water
+
+Water which has been cleansed of any contaminants or radiation. Sometimes found in sealed cans or bottles in the wasteland, but often produced by taking water from other sources and boiling or filtering it. Locations with water pumps tend to tap into uncontaminated aquifers deep underground, giving them a consistent supply of clean water highly sought-after by survivors in the wasteland. In places where water is scarce, access to purified water is a precious commodity.
+
+### RadAway (x4)
+
+An intravenous drug which purges radiation from the user&rsquo;s body, absorbing radiation as it circulates through the user&rsquo;s bloodstream. It&rsquo;s also a potent diuretic, expelling the radiation with the user&rsquo;s urine, so it&rsquo;s advisable to drink a lot of (clean) water shortly after taking a dose. Sometimes encountered in a diluted form, reducing its effectiveness as the user is only taking a partial dose. Diluted RadAway is only about half as effective, but it&rsquo;s easier to find.
+Use: RadAway can be used in one of two ways: it can be applied using the Take Chem minor action, healing 4 Radiation damage immediately, or it can be applied as part of a First Aid action, healing 4 Radiation damage in addition to any other healing done (remove Radiation damage before applying other healing effects). Diluted RadAway works in the same way, but only heals 2 Radiation damage.
+
+### Stimpak (x3)
+
+A stimulation delivery package, or Stimpak, is a form of fast-acting medication used to bolster the body&rsquo;s own healing and recuperative ability, and countless millions were produced for household and workplace first aid kits, hospitals, clinics, and other places. A wonder of pre-War science, a Stimpak is a single-use syringe filled with a variety of potent healing agents, stimulants, and painkillers, and can be applied in an intravenous or intramuscular fashion: literally stick it anywhere and it&rsquo;ll work. Even so, it a Stimpak is most effective when applied by an Auto-Doc or someone with medical training alongside other treatment.
+Sometimes encountered in a diluted form, reducing its effectiveness as the user is only taking a partial dose. Diluted Stimpaks are only about half as effective, but they&rsquo;re easier to find.
+Use: A Stimpak can be used in one of two ways: it can be applied using the Take Chem minor action, healing 4 HP or treating an Injury immediately, or it can be applied as part of a First Aid action, healing 4 HP or treating an Injury in addition to any other healing done. Diluted Stimpaks work in the same way, but only heal 2 HP, though they can still treat Injuries as normal.
 
 ## Gear & Miscellany
 
@@ -318,14 +241,6 @@ In addition, all Pip-Boy units aid their wearer during combat thanks to the Vaul
 
 ### Wasseraufbereitungstabletten (x12)
 
-## Addictions
-
-*None*
-
-## Diseases
-
-*None*
-
 ## Data
 
 Allgemeine Informationen
@@ -341,5 +256,5 @@ temp: Gl&uuml;ck -2 am 09.04.25
 
 ---
 
-*Character sheet generated on 2025-11-23 15:25*
+*Character sheet generated on 2025-11-23 15:39*
 *Generated with [Fallout Character Management](https://github.com/hnsstrk/fallout_char_mngt)*
