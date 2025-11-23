@@ -172,24 +172,27 @@ Character sheets are generated in Markdown format to `character_sheets/` directo
 1. **Header** - Name, Origin, Level, XP
 2. **S.P.E.C.I.A.L. Attributes** - Table with all 7 attributes
 3. **Derived Statistics** - Health, Defense, Initiative, Melee Damage, Carry Weight, Radiation
-4. **Skills** - Table with Tag, Rank, Attribute, Description columns
-5. **Body Status** - All 6 body parts with status, injuries, resistances
-6. **Perks** - Full descriptions and requirements
-7. **Trait** - Character trait with description
-8. **Addictions** - Placeholder section (*None* if empty) - BEFORE weapons
-9. **Diseases** - Placeholder section (*None* if empty) - BEFORE weapons
-10. **Weapons** - Weapon stats with full descriptions + Ammunition with descriptions
-11. **Apparel** - Locations covered, resistances, full descriptions
-12. **Consumables** - Full descriptions with quantities (not table format)
-13. **Gear & Miscellany** - Books, misc items with full descriptions
-14. **Data** - Character biography and background (from system.biography)
+4. **Conditions** - Hunger, Thirst, Sleep, Fatigue, Intoxication, Alcoholic, Well Rested
+5. **Skills** - Table with Tag, Rank, Attribute, Description columns
+6. **Body Status** - All 6 body parts with status, injuries, resistances (E/P/Po/R)
+7. **Perks** - Full descriptions and requirements
+8. **Trait** - Character trait with description
+9. **Addictions** - Placeholder section (*None* if empty) - BEFORE weapons
+10. **Diseases** - Placeholder section (*None* if empty) - BEFORE weapons
+11. **Weapons** - Weapon stats with full descriptions + Ammunition with descriptions
+12. **Apparel** - Locations covered, resistances, full descriptions
+13. **Consumables** - Full descriptions with quantities (not table format)
+14. **Gear & Miscellany** - Books, misc items with full descriptions
+15. **Data** - Character biography and background (from system.biography)
 
 **Important Design Decisions**:
+- **Conditions** appear after Derived Stats, before Skills (survival tracking)
 - **Skills** in table format with full descriptions included in table
+- **Body Status** resistances combine 3 sources: body part + global + equipped apparel
+- **Resistances order**: E/P/Po/R (Energy/Physical/Poison/Radiation)
 - **Addictions/Diseases** appear BEFORE Weapons for combat readiness check
 - **Ammunition** is part of Weapons section with full descriptions
 - **Consumables** show full descriptions (not table) for proper usage info
-- **Body Status** appears after Skills (early in sheet for quick reference)
 - All items with descriptions show FULL text (no truncation)
 - "Data" section (not "Biography") matches FVTT DATA tab naming
 

@@ -69,12 +69,14 @@ The generated Markdown character sheet includes:
 - **Level & XP** - Current level, XP, and next level requirements
 
 ### Character Details
+- **Conditions** - Hunger, Thirst, Sleep, Fatigue, Intoxication, Alcoholic status, Well Rested status
 - **Skills** - Complete skill list with tags, ranks, attributes, and descriptions (table format)
-- **Body Status** - All body parts with health status, injuries, and resistances
+- **Body Status** - All body parts with health status, injuries, and resistances (E/P/Po/R)
+  - Resistances combine body part + global + equipped apparel
 - **Perks** - Full descriptions and requirements for each perk
 - **Trait** - Character trait with complete description
 
-### Health & Conditions
+### Health & Status
 - **Addictions** - Current addictions (if any)
 - **Diseases** - Current diseases (if any)
 

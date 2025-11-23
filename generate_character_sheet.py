@@ -436,6 +436,39 @@ class CharacterSheetGenerator:
 
         return md
 
+    def generate_conditions(self) -> str:
+        """Generate conditions section."""
+        system = self.character_data.get('system', {})
+        conditions = system.get('conditions', {})
+
+        if not conditions:
+            return ""
+
+        md = "## Conditions\n\n"
+        md += "| Condition | Value |\n"
+        md += "|-----------|-------|\n"
+
+        # Extract condition values
+        hunger = conditions.get('hunger', 0)
+        thirst = conditions.get('thirst', 0)
+        sleep = conditions.get('sleep', 0)
+        fatigue = conditions.get('fatigue', 0)
+        intoxication = conditions.get('intoxication', 0)
+        alcoholic = conditions.get('alcoholic', False)
+        well_rested = conditions.get('wellRested', False)
+
+        # Display conditions
+        md += f"| Hunger | {hunger} |\n"
+        md += f"| Thirst | {thirst} |\n"
+        md += f"| Sleep | {sleep} |\n"
+        md += f"| Fatigue | {fatigue} |\n"
+        md += f"| Intoxication | {intoxication} |\n"
+        md += f"| Alcoholic | {'Yes' if alcoholic else 'No'} |\n"
+        md += f"| Well Rested | {'Yes' if well_rested else 'No'} |\n"
+
+        md += "\n"
+        return md
+
     def generate_body_status(self) -> str:
         """Generate body parts status section."""
         system = self.character_data.get('system', {})
@@ -555,6 +588,7 @@ class CharacterSheetGenerator:
         md = self.generate_header()
         md += self.generate_special_attributes()
         md += self.generate_derived_stats()
+        md += self.generate_conditions()
         md += self.generate_skills()
         md += self.generate_body_status()
         md += self.generate_perks()

@@ -28,6 +28,18 @@
 | **Carry Weight** | 0 / 190 lbs |
 | **Radiation** | 0 |
 
+## Conditions
+
+| Condition | Value |
+|-----------|-------|
+| Hunger | 0 |
+| Thirst | 0 |
+| Sleep | 0 |
+| Fatigue | 0 |
+| Intoxication | 0 |
+| Alcoholic | No |
+| Well Rested | Yes |
+
 ## Skills
 
 | Skill | Tag | Rank | Attribute | Description |
@@ -256,5 +268,5 @@ temp: Gl&uuml;ck -2 am 09.04.25
 
 ---
 
-*Character sheet generated on 2025-11-23 18:15*
+*Character sheet generated on 2025-11-23 18:23*
 *Generated with [Fallout Character Management](https://github.com/hnsstrk/fallout_char_mngt)*
