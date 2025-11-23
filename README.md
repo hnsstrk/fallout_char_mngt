@@ -177,7 +177,6 @@ This project uses **Claude Code** for development assistance.
 
 Developer documentation:
 - [`CLAUDE.md`](./CLAUDE.md) - Development guidance
-- [`DATA_ANALYSIS.md`](./DATA_ANALYSIS.md) - Analysis protocol
 - [`FIELD_INVENTORY.md`](./FIELD_INVENTORY.md) - Complete field documentation
 
 ## License & Attribution

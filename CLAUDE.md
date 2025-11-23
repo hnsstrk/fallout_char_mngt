@@ -29,26 +29,17 @@ These comprehensive offline character sheets are essential because the group has
 
 The analysis phase systematically identified and documented all data fields available in FVTT character exports, with complete validation against reference screenshots.
 
-**Hybrid Analysis Approach:**
+**Analysis Approach:**
 
 1. **Automated Field Extraction** - Python script analyzes JSON files
-   - `analyze_character.py` - Recursively extracts all JSON fields (2,167 fields from Ellie)
+   - `analyze_character.py` - Recursively extracts all JSON fields (2,167 fields total)
    - **Calculates derived statistics** using validated formulas from `reference_data/formulas.json`
    - Outputs `extracted_fields.json` (machine-readable complete field inventory with calculations)
    - Outputs `FIELD_INVENTORY.md` (human-readable categorized tables with 20 categories)
-   - Validates calculations against screenshots
-
-2. **Human Evaluation and Documentation** - Manual assessment in Markdown
-   - **DATA_ANALYSIS.md** - Field categorization protocol
-   - **ANALYSIS_EXPECTATIONS.md** - Comprehensive expectations documentation (539 lines)
-   - Screenshot validation across all 7 tabs of character sheet UI
-
-3. **Reference Screenshots** - Visual validation completed
-   - `screenshots/ellie/` - 7 screenshots covering all character sheet sections
-   - All calculated values validated against screenshots ✓
+   - All calculations validated against reference character data
 
 **Analysis Results:**
-- **Primary Character**: Dr. Eloise 'Ellie' Harper (Level 4, Vault 77)
+- **Primary Character**: Level 4 Character (Standard character type)
 - **Total Fields Extracted**: 2,167
 - **Total Items Analyzed**: 44 items across 9 types
 - **Item Types**: skill (17), perk (4), weapon (3), apparel (6), consumable (4), ammo (1), miscellany (7), books_and_magz (1), trait (1)
@@ -87,9 +78,6 @@ Refine output format, add PDF generation, styling, and layout optimization.
 fallout_char_mngt/
 ├── fvtt_export/                    # FoundryVTT character export files
 │   └── fvtt-Actor-*.json          # Individual character JSON exports (6 characters)
-├── screenshots/                    # Reference screenshots from FVTT
-│   └── ellie/                     # Screenshots for Dr. Eloise Harper
-│       └── Screenshot *.png       # 7 screenshots showing all character sheet sections
 ├── reference_data/                 # Extracted reference data (formulas, lookups)
 │   ├── SOURCE.md                  # Licensing and attribution information
 │   ├── README.md                  # Usage guide for reference data
@@ -101,8 +89,6 @@ fallout_char_mngt/
 ├── extracted_fields.json           # Complete field inventory (2,167 fields) with calculations
 ├── FIELD_INVENTORY.md              # Human-readable categorized field documentation (2,294 lines)
 ├── CLAUDE.md                       # This file - guidance for Claude Code
-├── DATA_ANALYSIS.md               # Analysis protocol and field categorization
-├── ANALYSIS_EXPECTATIONS.md       # Comprehensive field expectations (539 lines)
 └── README.md                       # GitHub repository overview
 ```
 
@@ -122,12 +108,11 @@ Each character JSON file follows the FoundryVTT actor schema and contains:
 **IMPORTANT**: The FVTT Fallout system has different actor types with different data structures:
 
 - **type: "character"** - Standard humanoid characters (humans, ghouls, super mutants)
-  - Examples: Dr. Eloise Harper, Ralph (Supermutant), Rebecca Holt, Roger Barkley, Lorian Manson
+  - Examples: Standard characters, Supermutant characters, Ghoul characters
   - Full S.P.E.C.I.A.L. attributes, skills, perks, body parts
 
 - **type: "robot"** - Robot/mechanical characters
-  - Example: Marcel (Mister Gutsy)
-  - Origin: "Mister Gutsy"
+  - Examples: Mister Gutsy, Protectron, Sentry Bot, etc.
   - Different attribute structure and capabilities compared to humanoid characters
   - May have different body part configurations
 
@@ -168,7 +153,7 @@ The `reference_data/` directory contains extracted formulas and reference inform
 - Next Level XP ((Level × (Level-1) / 2) × 100)
 - Encumbrance levels
 
-**All formulas are validated** against Dr. Eloise Harper character data.
+**All formulas are validated** against reference character data.
 
 **Usage**: When generating character sheets, use these formulas to calculate values that are often 0 in JSON exports (system.health.max, system.defense.value, etc.).
 
@@ -181,7 +166,7 @@ The `reference_data/` directory contains extracted formulas and reference inform
 Character sheets are generated in Markdown format to `character_sheets/` directory.
 
 **File naming**: `{character_name}.md` (lowercase, underscores, no special chars)
-- Example: `dr_eloise_ellie_harper.md`
+- Example: `character_name.md`
 
 **Character Sheet Structure** (in order):
 1. **Header** - Name, Origin, Level, XP
@@ -275,6 +260,5 @@ git commit -m "Add feature X and update documentation"
 
 ## System Information
 
-- **FoundryVTT Core**: Version 13.347-13.351
-- **Fallout System**: Version 11.14.3-11.16.4
-- **World ID**: neuland
+- **FoundryVTT Core**: Version 13.347-13.351 (tested)
+- **Fallout System**: Version 11.14.3-11.16.4 (tested)

@@ -303,7 +303,6 @@ class CharacterAnalyzer:
     def categorize_fields(self) -> Dict[str, List[str]]:
         """
         Categorize fields into logical groups for FIELD_INVENTORY.md.
-        Based on DATA_ANALYSIS.md structure.
         """
         categories = {
             'Character Basic Information': [],
