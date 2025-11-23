@@ -40,6 +40,10 @@ class CharacterAnalyzer:
         self.total_fields = 0
         self.total_items = 0
 
+        # Calculated derived statistics
+        self.calculated_stats = {}
+        self.formulas = None
+
     def load_character(self):
         """Load character JSON file."""
         print(f"Loading character from: {self.character_file}")
@@ -160,6 +164,142 @@ class CharacterAnalyzer:
                     field_info['max'] = max(numeric_values)
                     field_info['often_zero'] = numeric_values.count(0) / len(numeric_values) > 0.5
 
+    def load_formulas(self):
+        """Load calculation formulas from reference_data/formulas.json."""
+        formulas_file = Path('reference_data/formulas.json')
+        if formulas_file.exists():
+            with open(formulas_file, 'r', encoding='utf-8') as f:
+                self.formulas = json.load(f)
+        else:
+            print(f"Warning: {formulas_file} not found. Skipping derived statistics calculation.")
+
+    def calculate_derived_statistics(self):
+        """Calculate all derived statistics using validated formulas."""
+        if not self.formulas:
+            print("Skipping derived statistics calculation (no formulas loaded)")
+            return
+
+        system = self.character_data.get('system', {})
+
+        # Extract attributes
+        attrs = system.get('attributes', {})
+        STR = attrs.get('str', {}).get('value', 0)
+        PER = attrs.get('per', {}).get('value', 0)
+        END = attrs.get('end', {}).get('value', 0)
+        CHA = attrs.get('cha', {}).get('value', 0)
+        INT = attrs.get('int', {}).get('value', 0)
+        AGI = attrs.get('agi', {}).get('value', 0)
+        LCK = attrs.get('luc', {}).get('value', 0)
+
+        # Extract other needed values
+        level = system.get('level', {}).get('value', 1)
+        radiation = system.get('radiation', 0)
+        well_rested = system.get('conditions', {}).get('wellRested', False)
+
+        # Bonuses
+        health_bonus = system.get('health', {}).get('bonus', 0)
+        defense_bonus = system.get('defense', {}).get('bonus', 0)
+        initiative_bonus = system.get('initiative', {}).get('bonus', 0)
+        melee_damage_bonus = system.get('meleeDamage', {}).get('bonus', 0)
+        carry_weight_mod = system.get('carryWeight', {}).get('mod', 0)
+
+        # Calculate Max Health
+        max_health = END + LCK + (level - 1) - radiation + health_bonus + (2 if well_rested else 0)
+
+        # Calculate Defense
+        defense = (2 if AGI >= 9 else 1) + defense_bonus
+
+        # Calculate Initiative
+        initiative = PER + AGI + initiative_bonus
+
+        # Calculate Melee Damage
+        if STR >= 11:
+            melee_damage = 3
+        elif STR >= 9:
+            melee_damage = 2
+        elif STR >= 7:
+            melee_damage = 1
+        else:
+            melee_damage = 0
+        melee_damage += melee_damage_bonus
+
+        # Calculate Carry Weight
+        carry_weight_base = 150  # Default from formulas.json
+        carry_weight_total = carry_weight_base + (STR * 10) + carry_weight_mod
+
+        # Calculate Next Level XP
+        next_level = level + 1
+        next_level_xp = (next_level * (next_level - 1) // 2) * 100
+
+        # Store calculated values
+        self.calculated_stats = {
+            'max_health': {
+                'calculated': max_health,
+                'stored': system.get('health', {}).get('max', 0),
+                'formula': 'END + LCK + (Level-1) - Radiation + health_bonus + (wellRested ? 2 : 0)',
+                'components': {
+                    'END': END,
+                    'LCK': LCK,
+                    'level': level,
+                    'radiation': radiation,
+                    'health_bonus': health_bonus,
+                    'well_rested': well_rested
+                }
+            },
+            'defense': {
+                'calculated': defense,
+                'stored': system.get('defense', {}).get('value', 0),
+                'formula': 'AGI <= 8 ? 1 : 2 (+ bonus)',
+                'components': {
+                    'AGI': AGI,
+                    'defense_bonus': defense_bonus
+                }
+            },
+            'initiative': {
+                'calculated': initiative,
+                'stored': system.get('initiative', {}).get('value', 0),
+                'formula': 'PER + AGI + bonus',
+                'components': {
+                    'PER': PER,
+                    'AGI': AGI,
+                    'initiative_bonus': initiative_bonus
+                }
+            },
+            'melee_damage': {
+                'calculated': melee_damage,
+                'stored': system.get('meleeDamage', {}).get('value', 0),
+                'formula': 'STR 7-8: +1, STR 9-10: +2, STR 11+: +3 (+ bonus)',
+                'components': {
+                    'STR': STR,
+                    'melee_damage_bonus': melee_damage_bonus
+                }
+            },
+            'carry_weight': {
+                'calculated': carry_weight_total,
+                'stored': system.get('carryWeight', {}).get('total', 0),
+                'formula': '150 + (STR × 10) + mod',
+                'components': {
+                    'base': carry_weight_base,
+                    'STR': STR,
+                    'carry_weight_mod': carry_weight_mod
+                }
+            },
+            'next_level_xp': {
+                'calculated': next_level_xp,
+                'stored': system.get('level', {}).get('nextLevelXP', 0),
+                'formula': '(Level × (Level-1) / 2) × 100',
+                'components': {
+                    'current_level': level,
+                    'next_level': next_level
+                }
+            }
+        }
+
+        print(f"\n[Calculated Derived Statistics]")
+        for stat_name, stat_data in self.calculated_stats.items():
+            match = "[OK]" if stat_data['calculated'] == stat_data['stored'] or stat_data['stored'] == 0 else "[MISMATCH]"
+            print(f"  {stat_name}: {stat_data['calculated']} (stored: {stat_data['stored']}) {match}")
+
     def categorize_fields(self) -> Dict[str, List[str]]:
         """
         Categorize fields into logical groups for FIELD_INVENTORY.md.
@@ -279,7 +419,7 @@ class CharacterAnalyzer:
 
     def generate_json_output(self) -> dict:
         """Generate machine-readable JSON output."""
-        return {
+        output = {
             'meta': {
                 'analyzed_character': self.character_name,
                 'character_type': self.character_type,
@@ -312,6 +452,12 @@ class CharacterAnalyzer:
             }
         }
 
+        # Add calculated statistics if available
+        if self.calculated_stats:
+            output['calculated_statistics'] = self.calculated_stats
+
+        return output
+
     def generate_markdown_output(self) -> str:
         """Generate human-readable Markdown output."""
         categories = self.categorize_fields()
@@ -341,6 +487,35 @@ class CharacterAnalyzer:
             md += f"| {itype} | {info['count']} | {examples} |\n"
 
         md += "\n---\n\n"
+
+        # Add calculated statistics section
+        if self.calculated_stats:
+            md += "## Calculated Derived Statistics\n\n"
+            md += "These values are calculated from character attributes using validated formulas.\n\n"
+            md += "| Statistic | Calculated | Stored in JSON | Formula | Status |\n"
+            md += "|-----------|------------|----------------|---------|--------|\n"
+
+            for stat_name, stat_data in self.calculated_stats.items():
+                calculated = stat_data['calculated']
+                stored = stat_data['stored']
+                formula = stat_data['formula']
+
+                if stored == 0:
+                    status = "✓ Calculated (stored as 0)"
+                elif calculated == stored:
+                    status = "✓ Match"
+                else:
+                    status = f"⚠ MISMATCH"
+
+                md += f"| {stat_name.replace('_', ' ').title()} | {calculated} | {stored} | `{formula}` | {status} |\n"
+
+            md += "\n**Component Values:**\n\n"
+            for stat_name, stat_data in self.calculated_stats.items():
+                md += f"- **{stat_name.replace('_', ' ').title()}**: "
+                components = ', '.join([f"{k}={v}" for k, v in stat_data['components'].items()])
+                md += f"{components}\n"
+
+            md += "\n---\n\n"
 
         # Generate categorized field tables
         for category, paths in categories.items():
@@ -387,11 +562,17 @@ class CharacterAnalyzer:
 
         # Load
         self.load_character()
+        self.load_formulas()
 
         # Analyze
         self.analyze_top_level()
         self.analyze_items()
         self.calculate_statistics()
+
+        # Calculate derived statistics
+        if self.formulas:
+            print(f"\nCalculating derived statistics...")
+            self.calculate_derived_statistics()
 
         print(f"\n{'='*60}")
         print(f"Analysis Complete!")

@@ -4,7 +4,7 @@
     "character_type": "character",
     "character_level": 4,
     "character_file": "fvtt_export\\fvtt-Actor-dr.-eloise-'ellie'-harper-jkTOphZz7Tvl7Qqn.json",
-    "analyzed_date": "2025-11-23T13:47:22.841035",
+    "analyzed_date": "2025-11-23T14:21:26.172013",
     "total_fields": 2167,
     "total_items": 44
   },
@@ -27835,6 +27835,68 @@
         "Switchblade",
         "Polierte Pfanne \"Sophie\""
       ]
+    }
+  },
+  "calculated_statistics": {
+    "max_health": {
+      "calculated": 13,
+      "stored": 0,
+      "formula": "END + LCK + (Level-1) - Radiation + health_bonus + (wellRested ? 2 : 0)",
+      "components": {
+        "END": 4,
+        "LCK": 4,
+        "level": 4,
+        "radiation": 0,
+        "health_bonus": 0,
+        "well_rested": true
+      }
+    },
+    "defense": {
+      "calculated": 1,
+      "stored": 0,
+      "formula": "AGI <= 8 ? 1 : 2 (+ bonus)",
+      "components": {
+        "AGI": 6,
+        "defense_bonus": 0
+      }
+    },
+    "initiative": {
+      "calculated": 14,
+      "stored": 0,
+      "formula": "PER + AGI + bonus",
+      "components": {
+        "PER": 8,
+        "AGI": 6,
+        "initiative_bonus": 0
+      }
+    },
+    "melee_damage": {
+      "calculated": 0,
+      "stored": 0,
+      "formula": "STR 7-8: +1, STR 9-10: +2, STR 11+: +3 (+ bonus)",
+      "components": {
+        "STR": 4,
+        "melee_damage_bonus": 0
+      }
+    },
+    "carry_weight": {
+      "calculated": 190,
+      "stored": 0,
+      "formula": "150 + (STR × 10) + mod",
+      "components": {
+        "base": 150,
+        "STR": 4,
+        "carry_weight_mod": 0
+      }
+    },
+    "next_level_xp": {
+      "calculated": 1000,
+      "stored": 0,
+      "formula": "(Level × (Level-1) / 2) × 100",
+      "components": {
+        "current_level": 4,
+        "next_level": 5
+      }
     }
   }
 }

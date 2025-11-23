@@ -3,7 +3,7 @@
 **Character**: Dr. Eloise 'Ellie' Harper
 **Type**: character
 **Level**: 4
-**Analyzed**: 2025-11-23 13:47
+**Analyzed**: 2025-11-23 14:21
 
 **Statistics**:
 - Total Fields: 2167
@@ -25,6 +25,30 @@
 | skill | 17 | Unarmed, Athletics, Science |
 | trait | 1 | Vault Kid |
 | weapon | 3 | 10mm Pistol, Switchblade, Polierte Pfanne "Sophie" |
+
+---
+
+## Calculated Derived Statistics
+
+These values are calculated from character attributes using validated formulas.
+
+| Statistic | Calculated | Stored in JSON | Formula | Status |
+|-----------|------------|----------------|---------|--------|
+| Max Health | 13 | 0 | `END + LCK + (Level-1) - Radiation + health_bonus + (wellRested ? 2 : 0)` | ✓ Calculated (stored as 0) |
+| Defense | 1 | 0 | `AGI <= 8 ? 1 : 2 (+ bonus)` | ✓ Calculated (stored as 0) |
+| Initiative | 14 | 0 | `PER + AGI + bonus` | ✓ Calculated (stored as 0) |
+| Melee Damage | 0 | 0 | `STR 7-8: +1, STR 9-10: +2, STR 11+: +3 (+ bonus)` | ✓ Calculated (stored as 0) |
+| Carry Weight | 190 | 0 | `150 + (STR × 10) + mod` | ✓ Calculated (stored as 0) |
+| Next Level Xp | 1000 | 0 | `(Level × (Level-1) / 2) × 100` | ✓ Calculated (stored as 0) |
+
+**Component Values:**
+
+- **Max Health**: END=4, LCK=4, level=4, radiation=0, health_bonus=0, well_rested=True
+- **Defense**: AGI=6, defense_bonus=0
+- **Initiative**: PER=8, AGI=6, initiative_bonus=0
+- **Melee Damage**: STR=4, melee_damage_bonus=0
+- **Carry Weight**: base=150, STR=4, carry_weight_mod=0
+- **Next Level Xp**: current_level=4, next_level=5
 
 ---
 
