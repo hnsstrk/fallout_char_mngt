@@ -45,10 +45,10 @@ The generated character sheet will be saved to `character_sheets/` as a Markdown
 
 **Example:**
 ```bash
-python generate_character_sheet.py "fvtt_export/fvtt-Actor-dr.-eloise-'ellie'-harper-jkTOphZz7Tvl7Qqn.json"
+python generate_character_sheet.py "fvtt_export/fvtt-Actor-character-name-ABC123XYZ.json"
 ```
 
-Output: `character_sheets/dr_eloise_ellie_harper.md`
+Output: `character_sheets/character_name.md`
 
 ### Validating Character Data
 
@@ -66,7 +66,7 @@ python validate_character.py --all
 
 **Example:**
 ```bash
-python validate_character.py "fvtt_export/fvtt-Actor-marcel-O44zYNGmMfYtSjVw.json"
+python validate_character.py "fvtt_export/fvtt-Actor-character-name-ABC123XYZ.json"
 ```
 
 The validation tool checks for:
@@ -106,10 +106,10 @@ The tool produces a detailed report with:
 Example validation result:
 ```
 ======================================================================
-Character Validation Report: Marcel
+Character Validation Report: Wasteland Wanderer
 ======================================================================
-File: fvtt-Actor-marcel-O44zYNGmMfYtSjVw.json
-Type: robot
+File: fvtt-Actor-character-name-ABC123XYZ.json
+Type: character
 ======================================================================
 
 ## Schema Validation
@@ -126,7 +126,7 @@ Type: robot
 ----------------------------------------------------------------------
 ℹ️  Found 3 completeness issue(s):
   1. Next level XP is 0 (needs calculation)
-  2. Items missing descriptions: bow tie (miscellany)
+  2. Items missing descriptions: custom item (miscellany)
   3. Character has 3 weapons but none equipped
 
 ## Summary
