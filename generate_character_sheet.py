@@ -589,8 +589,8 @@ class CharacterSheetGenerator:
         md += self.generate_special_attributes()
         md += self.generate_derived_stats()
         md += self.generate_conditions()
-        md += self.generate_skills()
         md += self.generate_body_status()
+        md += self.generate_skills()
         md += self.generate_perks()
         md += self.generate_trait()
         md += self.generate_addictions()  # Before weapons

@@ -173,8 +173,8 @@ Character sheets are generated in Markdown format to `character_sheets/` directo
 2. **S.P.E.C.I.A.L. Attributes** - Table with all 7 attributes
 3. **Derived Statistics** - Health, Defense, Initiative, Melee Damage, Carry Weight, Radiation
 4. **Conditions** - Hunger, Thirst, Sleep, Fatigue, Intoxication, Alcoholic, Well Rested
-5. **Skills** - Table with Tag, Rank, Attribute, Description columns
-6. **Body Status** - All 6 body parts with status, injuries, resistances (E/P/Po/R)
+5. **Body Status** - All 6 body parts with status, injuries, resistances (E/P/Po/R)
+6. **Skills** - Table with Tag, Rank, Attribute, Description columns
 7. **Perks** - Full descriptions and requirements
 8. **Trait** - Character trait with description
 9. **Addictions** - Placeholder section (*None* if empty) - BEFORE weapons

@@ -40,6 +40,17 @@
 | Alcoholic | No |
 | Well Rested | Yes |
 
+## Body Status
+
+| Body Part | Status | Injuries | Resistances (E/P/Po/R) |
+|-----------|--------|----------|------------------------|
+| Head | Healthy | None | 0/0/0/0 |
+| Torso | Healthy | None | 1/0/0/2 |
+| Left Arm | Healthy | None | 1/0/0/2 |
+| Right Arm | Healthy | None | 1/0/0/2 |
+| Left Leg | Healthy | None | 1/0/0/2 |
+| Right Leg | Healthy | None | 1/0/0/2 |
+
 ## Skills
 
 | Skill | Tag | Rank | Attribute | Description |
@@ -61,17 +72,6 @@
 | Survival |  | 1 | END | The Survival skill covers all manner of practical bush craft, like hunting, foraging, fishing, building makeshift shelters, and lighting fires. Its default S.P.E.C.I.A.L. attribute is Endurance but you might also use it with Perception to figure out how long you have until nightfall, or Charisma to charm animals. You might use Survival to build a base camp, or test your resilience against malnourishment or dehydration. |
 | Throwing |  | 1 | AGI | The Throwing skill describes your ability to effectively make attacks with thrown weapons like javelins, knives, and improvised weapons. Its default S.P.E.C.I.A.L. attribute is Agility but you might also use Strength with heavy objects or Perception to judge distance. You use Throwing to make thrown attacks with specific weapons. |
 | Unarmed |  | 1 | STR | The Unarmed skill covers your ability to fight with your fists. Its default S.P.E.C.I.A.L. attribute is Strength but you might also use Agility, or Charisma when threatening or intimidating someone. You use the Unarmed skill to make unarmed attacks in combat. |
-
-## Body Status
-
-| Body Part | Status | Injuries | Resistances (E/P/Po/R) |
-|-----------|--------|----------|------------------------|
-| Head | Healthy | None | 0/0/0/0 |
-| Torso | Healthy | None | 1/0/0/2 |
-| Left Arm | Healthy | None | 1/0/0/2 |
-| Right Arm | Healthy | None | 1/0/0/2 |
-| Left Leg | Healthy | None | 1/0/0/2 |
-| Right Leg | Healthy | None | 1/0/0/2 |
 
 ## Perks
 
@@ -268,5 +268,5 @@ temp: Gl&uuml;ck -2 am 09.04.25
 
 ---
 
-*Character sheet generated on 2025-11-23 18:23*
+*Character sheet generated on 2025-11-23 18:29*
 *Generated with [Fallout Character Management](https://github.com/hnsstrk/fallout_char_mngt)*
