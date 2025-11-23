@@ -103,8 +103,16 @@ Dieses Dokument definiert, welche Daten, Informationen und Werte wir aus den JSO
 - **Aktuelles Gewicht**: Summe aller `items[].system.weight * quantity`
 
 **Next Level XP:**
-- **FVTT Formel:** `(nextLevel × currentLevel ÷ 2) × 100`
-- Beispiel (Ellie Level 4→5): (5 × 4 ÷ 2) × 100 = 1000 XP ✓
+- **Formel:** `(Level × (Level - 1) / 2) × 100`
+  - "Level" ist das Ziel-Level (für das die XP benötigt werden)
+- Beispiel (Ellie Level 4→5):
+  - Für Level 5: (5 × (5-1) / 2) × 100 = (5 × 4 / 2) × 100 = 1000 XP ✓
+- **XP-Progression Tabelle:**
+  - Level 2: (2×1/2)×100 = 100 XP
+  - Level 3: (3×2/2)×100 = 300 XP
+  - Level 4: (4×3/2)×100 = 600 XP
+  - Level 5: (5×4/2)×100 = 1000 XP
+  - Level 6: (6×5/2)×100 = 1500 XP
 - JSON: `system.level.nextLevelXP` (oft 0, wird berechnet)
 - JSON: `system.level.currentXP` - Aktuell gesammelte XP
 - JSON: `system.level.rewardXP` - Belohnungs-XP
@@ -440,12 +448,14 @@ Das Script MUSS folgende Werte berechnen können, da sie oft 0 in JSON sind:
 - **Aktuelles Gewicht**: Summe aller `items[].system.weight * quantity`
 
 **Zusätzliche Erkenntnisse:**
-- **Next Level XP**: ✓ Formel gefunden: `(nextLevel × currentLevel ÷ 2) × 100`
+- **Next Level XP**: ✓ Formel: `(Level × (Level - 1) / 2) × 100`
 - **Encumbrance Level**: ✓ Wird aus Verhältnis aktuelles/max Gewicht berechnet
 - **Body Resistances**: Werden aus equipped Armor/Clothing/PowerArmor aggregiert
 - **Action Points (AP)**: Nicht persistent - nur während Combat relevant
 
-**Alle Formeln stammen aus**: [FVTT Fallout System - FalloutActor.mjs](https://github.com/Muttley/foundryvtt-fallout/blob/main/system/src/documents/FalloutActor.mjs)
+**Quellen der Formeln:**
+- Fallout 2d20 TTRPG Quellenbuch (Max HP Basis, Attribute-basierte Berechnungen)
+- [FVTT Fallout System - FalloutActor.mjs](https://github.com/Muttley/foundryvtt-fallout/blob/main/system/src/documents/FalloutActor.mjs) (Well Rested Bonus, XP-Progression)
 
 ### 2. HTML-Parsing
 Viele Felder enthalten HTML:

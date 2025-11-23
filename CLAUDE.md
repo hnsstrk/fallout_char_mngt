@@ -84,6 +84,10 @@ fallout_char_mngt/
 ├── screenshots/                    # Reference screenshots from FVTT
 │   └── ellie/                     # Screenshots for Dr. Eloise Harper
 │       └── Screenshot *.png       # 7 screenshots showing character sheet sections
+├── reference_data/                 # Extracted reference data (formulas, lookups)
+│   ├── SOURCE.md                  # Licensing and attribution information
+│   ├── README.md                  # Usage guide for reference data
+│   └── formulas.json              # Derived statistics calculation formulas
 ├── CLAUDE.md                       # This file - guidance for Claude Code
 ├── DATA_ANALYSIS.md               # Analysis protocol and field documentation
 └── ANALYSIS_EXPECTATIONS.md       # Comprehensive expectations for data extraction script
@@ -136,6 +140,28 @@ When parsing or modifying character JSON files:
 2. Preserve the `_stats` metadata when modifying files
 3. Each embedded item in the `items` array has its own complete FoundryVTT document structure
 4. Character images reference paths like `tokenizer/pc-images/` or `tokenizer/npc-images/`
+
+## Reference Data
+
+The `reference_data/` directory contains extracted formulas and reference information:
+
+### `formulas.json`
+**Complete calculation formulas for all derived statistics:**
+- Max Health (including Well Rested +2 bonus, radiation penalty)
+- Defense (Agility-based)
+- Initiative (PER + AGI)
+- Melee Damage (Strength tiers)
+- Carry Weight (150 + STR×10)
+- Next Level XP ((Level × (Level-1) / 2) × 100)
+- Encumbrance levels
+
+**All formulas are validated** against Dr. Eloise Harper character data.
+
+**Usage**: When generating character sheets, use these formulas to calculate values that are often 0 in JSON exports (system.health.max, system.defense.value, etc.).
+
+**Source**: Extracted from [FVTT Fallout System code](https://github.com/Muttley/foundryvtt-fallout/blob/main/system/src/documents/FalloutActor.mjs) and Fallout 2d20 Rulebook.
+
+**License**: See `reference_data/SOURCE.md` for attribution and licensing information. For personal/group offline play only.
 
 ## System Information
 
