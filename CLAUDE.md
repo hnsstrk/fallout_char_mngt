@@ -43,14 +43,29 @@ The analysis phase systematically identified and documented all data fields avai
 - ✅ Screenshot validation completed
 - ✅ Clear understanding of character sheet requirements
 
-### Phase 2: Implementation (Current)
-Generate comprehensive Markdown character sheets from JSON exports.
+### Phase 2: Implementation ✅ COMPLETED
 
-**Objectives:**
-- Python character sheet generator script
-- Use extracted field inventory and calculated statistics
-- Template-based Markdown generation
-- Complete character data rendering (all stats, skills, perks, equipment, descriptions)
+**Milestone 2: Character sheet generator - ACHIEVED**
+
+The implementation phase successfully created a fully functional character sheet generator with comprehensive data rendering.
+
+**Implementation Results:**
+- Complete Python character sheet generator (`generate_character_sheet.py`, 662 lines)
+- 20+ specialized methods for different character sheet sections
+- Validated derived statistics calculation (formulas.json integration)
+- Full Markdown output with all character data
+- 15-section character sheet structure
+
+**Success Criteria - ALL ACHIEVED:**
+- ✅ Character sheet generator implemented
+- ✅ All statistics calculated correctly (max health, defense, initiative, etc.)
+- ✅ Complete skill rendering with descriptions
+- ✅ Full perk and trait descriptions included
+- ✅ Comprehensive equipment lists (weapons, apparel, consumables, gear)
+- ✅ Body part tracking with resistances (E/P/Po/R from 3 sources)
+- ✅ Conditions tracking (hunger, thirst, sleep, etc.)
+- ✅ Clean Markdown output format
+- ✅ Character sheet validated against reference data
 
 ### Phase 3: Enhancement (Future)
 Refine output format, add PDF generation, styling, and layout optimization.
@@ -241,7 +256,248 @@ git add generate_character_sheet.py README.md
 git commit -m "Add feature X and update documentation"
 ```
 
+## Character Sheet Generator
+
+### Script Overview
+
+The `generate_character_sheet.py` script is a comprehensive character sheet generator with the following capabilities:
+
+**Core Functionality:**
+- Loads FVTT character JSON exports
+- Calculates all derived statistics using validated formulas
+- Generates 15-section Markdown character sheets
+- Handles both "character" and "robot" actor types
+- Strips HTML from descriptions and formats text properly
+- Sanitizes filenames for safe output
+
+**Generator Methods:**
+
+The `CharacterSheetGenerator` class contains these specialized methods:
+
+1. **Data Loading:**
+   - `load_character()` - Load and validate character JSON
+   - `load_formulas()` - Load calculation formulas from reference_data/
+
+2. **Calculations:**
+   - `calculate_derived_statistics()` - Calculate all derived stats (health, defense, initiative, melee damage, carry weight)
+
+3. **Utilities:**
+   - `strip_html()` - Remove HTML tags from descriptions
+   - `format_description()` - Format and indent description text
+
+4. **Sheet Sections (in render order):**
+   - `generate_header()` - Name, origin, level, XP
+   - `generate_special_attributes()` - S.P.E.C.I.A.L. table
+   - `generate_derived_stats()` - Health, defense, initiative, etc.
+   - `generate_conditions()` - Hunger, thirst, sleep, fatigue, etc.
+   - `generate_body_status()` - Body parts with injuries and resistances
+   - `generate_skills()` - Skills table with tags, ranks, descriptions
+   - `generate_perks()` - Perks with full descriptions
+   - `generate_trait()` - Character trait with description
+   - `generate_addictions()` - Addiction tracking
+   - `generate_diseases()` - Disease tracking
+   - `generate_weapons()` - Weapons + ammunition with descriptions
+   - `generate_apparel()` - Armor with locations and resistances
+   - `generate_consumables()` - Food/chems with descriptions
+   - `generate_gear()` - Books and miscellany
+   - `generate_data()` - Biography and background
+
+5. **Output:**
+   - `generate_character_sheet()` - Assembles all sections
+   - `run()` - Main execution flow
+
+### Usage
+
+**Command Line:**
+```bash
+python generate_character_sheet.py fvtt_export/<character-file>.json
+```
+
+**Output:**
+- Character sheet saved to `character_sheets/{character_name}.md`
+- Filename sanitized: lowercase, underscores, no special chars
+- Example: `dr_eloise_ellie_harper.md`
+
+### Key Design Patterns
+
+**HTML Handling:**
+- All descriptions stripped of HTML tags (`<p>`, `<em>`, etc.)
+- HTML entities decoded (`&rsquo;` → `'`)
+- Preserves readability in plain Markdown
+
+**Resistance Calculation:**
+- Body part resistances combine 3 sources:
+  1. Body part base resistance (`system.body_parts.*.resistance.*`)
+  2. Global character resistance (`system.resistance.*`)
+  3. Equipped apparel resistance (if item covers that location)
+- Order: E/P/Po/R (Energy/Physical/Poison/Radiation)
+
+**Section Ordering:**
+- Conditions before Skills (survival tracking priority)
+- Body Status before Skills (combat readiness)
+- Addictions/Diseases before Weapons (combat preparation)
+- Ammunition within Weapons section (not separate)
+
+## Development Workflows
+
+### Adding New Features
+
+When adding new features to the character sheet generator:
+
+1. **Read the code first** - Always use the Read tool to understand existing implementation
+2. **Update formulas.json** - If adding new calculations, document formulas in `reference_data/formulas.json`
+3. **Follow section order** - Maintain the 15-section structure unless explicitly changing design
+4. **Preserve HTML stripping** - All descriptions must pass through `strip_html()` and `format_description()`
+5. **Test with multiple characters** - Validate changes against different character types
+6. **Update README.md** - Follow the Documentation Maintenance protocol (see below)
+
+### Code Conventions
+
+**Python Style:**
+- Type hints for all method signatures
+- Docstrings for all public methods
+- Path objects (not strings) for file paths
+- UTF-8 encoding for all file operations
+- Class-based organization (single CharacterSheetGenerator class)
+
+**Naming Conventions:**
+- Methods: `snake_case` (e.g., `generate_special_attributes()`)
+- Private attributes: Prefix with underscore if needed
+- Constants: UPPER_CASE (in formulas.json)
+- File outputs: lowercase with underscores (e.g., `character_name.md`)
+
+**Error Handling:**
+- Check file existence before processing
+- Provide clear error messages with file paths
+- Use `sys.exit(1)` for fatal errors
+- Print progress messages for long operations
+
+**JSON Access Patterns:**
+```python
+# Always use .get() with defaults for nested JSON
+attrs = system.get('attributes', {})
+STR = attrs.get('str', {}).get('value', 0)
+
+# Never assume keys exist
+level = system.get('level', {}).get('value', 1)  # Good
+level = system['level']['value']                  # Bad - will crash
+```
+
+### Testing Character Sheets
+
+**Manual Validation:**
+1. Generate sheet for a test character
+2. Compare against FVTT character sheet (screenshots)
+3. Verify all sections present and in correct order
+4. Check derived statistics match expected values
+5. Confirm all descriptions are readable (no HTML artifacts)
+
+**Reference Characters:**
+- Use existing exports in `fvtt_export/` as test cases
+- 6 characters available for validation
+- Test with both "character" and "robot" types
+
+**Validation Checklist:**
+- [ ] All 15 sections present
+- [ ] S.P.E.C.I.A.L. values match JSON
+- [ ] Derived stats calculated correctly
+- [ ] Skills table complete with descriptions
+- [ ] Perks show full text
+- [ ] Weapons include damage, range, qualities
+- [ ] Body part resistances include all 3 sources
+- [ ] No HTML tags in output
+- [ ] Markdown renders correctly
+
+### Git Workflow
+
+**Branch Strategy:**
+- Main branch: `main` (or default branch)
+- Feature branches: `feature/description` or `fix/issue-description`
+- Use provided claude/ branches for Claude Code sessions
+
+**Commit Messages:**
+- Use clear, descriptive commit messages
+- Format: `Verb noun phrase` (e.g., "Add conditions section to character sheets")
+- Focus on what changed, not why (use PR descriptions for why)
+- Keep commits atomic (one logical change per commit)
+
+**Pre-Commit Workflow:**
+1. Review all changes
+2. Check if README.md needs updates (see Documentation Maintenance)
+3. Run generator on test character to verify functionality
+4. Commit both code and documentation changes together
+
+**Example:**
+```bash
+# Make changes to generator
+vim generate_character_sheet.py
+
+# Test changes
+python generate_character_sheet.py fvtt_export/fvtt-Actor-686727-_ralph_-SGf3yxAMbFEqmONj.json
+
+# Update README.md if needed
+vim README.md
+
+# Commit together
+git add generate_character_sheet.py README.md
+git commit -m "Add XP progression display to character header"
+git push -u origin claude/your-branch-name
+```
+
+### Working with Large JSON Files
+
+Character JSON files can be 100KB+ (e.g., Roger Barkley at 186KB). When reading:
+
+1. **Use Read tool with offset/limit** - For initial exploration
+2. **Load full file with json.load()** - For processing (Python handles memory efficiently)
+3. **Access nested data safely** - Always use `.get()` with defaults
+4. **Filter items by type** - Use list comprehensions for efficiency
+
+**Example:**
+```python
+# Get all weapons
+weapons = [item for item in character_data.get('items', [])
+           if item.get('type') == 'weapon']
+
+# Get specific skill
+athletics = next((item for item in character_data.get('items', [])
+                  if item.get('type') == 'skill' and
+                  item.get('name') == 'Athletics'), None)
+```
+
+## Troubleshooting
+
+### Common Issues
+
+**"File not found" errors:**
+- Verify file path is correct (use Tab completion)
+- Check that file is in `fvtt_export/` directory
+- Remember to quote filenames with special characters
+
+**Empty or missing sections:**
+- Check if character has that item type in JSON
+- Verify item type filter in generator method
+- Some sections show "None" if empty (addictions, diseases)
+
+**Incorrect derived statistics:**
+- Verify formulas.json is present in reference_data/
+- Check S.P.E.C.I.A.L. attributes are loaded correctly
+- Review calculation in `calculate_derived_statistics()`
+
+**HTML in output:**
+- Ensure all descriptions pass through `strip_html()`
+- Check that `format_description()` is called
+- Some HTML entities may need additional handling
+
+**Wrong resistance values:**
+- Verify all 3 resistance sources are summed
+- Check apparel location coverage
+- Confirm body part mapping (armL, armR, head, torso, legL, legR)
+
 ## System Information
 
+- **Python**: 3.6+ required (tested with 3.11.14)
+- **Dependencies**: None (uses Python standard library only)
 - **FoundryVTT Core**: Version 13.347-13.351 (tested)
 - **Fallout System**: Version 11.14.3-11.16.4 (tested)
+- **Operating System**: Cross-platform (Linux, macOS, Windows)
