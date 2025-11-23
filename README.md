@@ -50,6 +50,95 @@ python generate_character_sheet.py "fvtt_export/fvtt-Actor-dr.-eloise-'ellie'-ha
 
 Output: `character_sheets/dr_eloise_ellie_harper.md`
 
+### Validating Character Data
+
+Before generating character sheets, you can validate your character JSON exports for data quality and completeness:
+
+```bash
+python validate_character.py fvtt_export/your-character-file.json
+```
+
+Or validate all characters at once:
+
+```bash
+python validate_character.py --all
+```
+
+**Example:**
+```bash
+python validate_character.py "fvtt_export/fvtt-Actor-marcel-O44zYNGmMfYtSjVw.json"
+```
+
+The validation tool checks for:
+
+#### Schema Validation
+- Required JSON fields present (name, type, system, items, etc.)
+- Correct FoundryVTT structure
+- Valid character type (character, robot, creature, npc)
+- All S.P.E.C.I.A.L. attributes present
+- Body parts structure complete
+
+#### Health Checks
+- S.P.E.C.I.A.L. attributes in valid range (typically 1-10)
+- No negative health or radiation values
+- Character level >= 1
+- Conditions (hunger, thirst, sleep) in expected ranges
+- Body part status valid (healthy, injured, crippled)
+- Untreated injuries detected
+- Item quantities valid (no negative values)
+
+#### Completeness Report
+- Missing character origin or biography
+- Skills count (expects 17 skills for characters)
+- Missing item descriptions
+- Unequipped weapons or apparel
+- Empty XP tracking fields
+- Calculated fields that need updating (max health, initiative, etc.)
+
+**Validation Output:**
+
+The tool produces a detailed report with:
+- ✅ **Passed checks** - Green checkmarks for valid data
+- ⚠️  **Warnings** - Yellow warnings for unusual values
+- ❌ **Errors** - Red errors for missing required fields
+- ℹ️  **Info** - Blue notices for completeness issues
+
+Example validation result:
+```
+======================================================================
+Character Validation Report: Marcel
+======================================================================
+File: fvtt-Actor-marcel-O44zYNGmMfYtSjVw.json
+Type: robot
+======================================================================
+
+## Schema Validation
+----------------------------------------------------------------------
+✅ Schema validation passed - all required fields present
+
+## Health Checks
+----------------------------------------------------------------------
+⚠️  Found 2 warning(s):
+  1. Max health is 0 (likely needs calculation)
+  2. Initiative value is 0 but should be calculated (PER + AGI)
+
+## Completeness Report
+----------------------------------------------------------------------
+ℹ️  Found 3 completeness issue(s):
+  1. Next level XP is 0 (needs calculation)
+  2. Items missing descriptions: bow tie (miscellany)
+  3. Character has 3 weapons but none equipped
+
+## Summary
+----------------------------------------------------------------------
+⚠️  Validation completed with 5 total issue(s):
+   - Schema errors: 0
+   - Health warnings: 2
+   - Completeness issues: 3
+```
+
+**Note:** Some warnings are expected (e.g., "max health is 0") because FoundryVTT stores some derived statistics as 0, which the character sheet generator calculates automatically.
+
 
 ## Generated Character Sheet Contents
 
@@ -120,6 +209,7 @@ fallout_char_mngt/
 ├── character_sheets/               # Generated character sheets (Markdown)
 ├── reference_data/                 # Calculation formulas and attribution
 ├── generate_character_sheet.py    # Character sheet generator
+├── validate_character.py           # Character data validation tool
 ├── CLAUDE.md                       # Development guidance
 └── README.md                       # This file
 ```
@@ -160,6 +250,7 @@ See [`reference_data/SOURCE.md`](./reference_data/SOURCE.md) for complete attrib
 - Character sheet generator functional
 - Markdown output with all character data
 - Derived statistics calculation
+- Data validation and quality checks
 
 **Phase 3: Enhancement** (Future)
 - PDF generation
