@@ -133,6 +133,201 @@ Type: character
 
 **Note:** Some warnings are expected (e.g., "max health is 0") because FoundryVTT stores some derived statistics as 0, which the character sheet generator calculates automatically.
 
+### Batch Processing Multiple Characters
+
+The validator and generator are designed as single-purpose tools that can be combined in batch workflows.
+
+#### Linux / macOS
+
+**Simple Batch Processing:**
+```bash
+# Validate all characters
+for file in fvtt_export/fvtt-Actor-*.json; do
+    python validate_character.py "$file"
+done
+
+# Generate all character sheets
+for file in fvtt_export/fvtt-Actor-*.json; do
+    python generate_character_sheet.py "$file"
+done
+```
+
+**Save Validation Reports:**
+```bash
+# Create log directory
+mkdir -p validation_logs
+
+# Validate and save each report
+for file in fvtt_export/fvtt-Actor-*.json; do
+    basename=$(basename "$file" .json)
+    echo "Validating: $basename"
+    python validate_character.py "$file" > "validation_logs/${basename}_report.txt"
+done
+```
+
+**Combined Workflow with Exit Code Check:**
+```bash
+#!/bin/bash
+# process_all_characters.sh
+
+for file in fvtt_export/fvtt-Actor-*.json; do
+    echo "Processing: $(basename "$file")"
+
+    # Validate first
+    if python validate_character.py "$file" > /dev/null 2>&1; then
+        echo "  ✅ Validation passed"
+    else
+        echo "  ⚠️  Validation warnings found (continuing)"
+    fi
+
+    # Generate character sheet
+    python generate_character_sheet.py "$file"
+    echo "  📄 Character sheet generated"
+    echo ""
+done
+```
+
+**Redirect stdout and stderr:**
+```bash
+# Stdout to file, stderr to terminal
+python validate_character.py character.json > validation.log
+
+# Both stdout and stderr to file
+python validate_character.py character.json &> validation_full.log
+
+# Stdout to file, stderr to separate file
+python validate_character.py character.json > validation.log 2> errors.log
+
+# Show on terminal AND save to file (using tee)
+python validate_character.py character.json | tee validation.log
+```
+
+#### Windows PowerShell
+
+**Simple Batch Processing:**
+```powershell
+# Validate all characters
+Get-ChildItem fvtt_export\fvtt-Actor-*.json | ForEach-Object {
+    python validate_character.py $_.FullName
+}
+
+# Generate all character sheets
+Get-ChildItem fvtt_export\fvtt-Actor-*.json | ForEach-Object {
+    python generate_character_sheet.py $_.FullName
+}
+```
+
+**Save Validation Reports:**
+```powershell
+# Create log directory
+New-Item -ItemType Directory -Force -Path validation_logs
+
+# Validate and save each report
+Get-ChildItem fvtt_export\fvtt-Actor-*.json | ForEach-Object {
+    $basename = $_.BaseName
+    Write-Host "Validating: $basename"
+    python validate_character.py $_.FullName > "validation_logs\${basename}_report.txt"
+}
+```
+
+**Combined Workflow with Exit Code Check:**
+```powershell
+# process_all_characters.ps1
+
+Get-ChildItem fvtt_export\fvtt-Actor-*.json | ForEach-Object {
+    Write-Host "Processing: $($_.Name)"
+
+    # Validate first
+    python validate_character.py $_.FullName > $null 2>&1
+    if ($LASTEXITCODE -eq 0) {
+        Write-Host "  ✅ Validation passed" -ForegroundColor Green
+    } else {
+        Write-Host "  ⚠️  Validation warnings found (continuing)" -ForegroundColor Yellow
+    }
+
+    # Generate character sheet
+    python generate_character_sheet.py $_.FullName
+    Write-Host "  📄 Character sheet generated" -ForegroundColor Cyan
+    Write-Host ""
+}
+```
+
+**Redirect stdout:**
+```powershell
+# Stdout to file
+python validate_character.py character.json > validation.log
+
+# Both stdout and stderr to file
+python validate_character.py character.json *> validation_full.log
+
+# Stdout to file, stderr to separate file
+python validate_character.py character.json > validation.log 2> errors.log
+
+# Show on terminal AND save to file (using Tee-Object)
+python validate_character.py character.json | Tee-Object -FilePath validation.log
+```
+
+#### Windows CMD (Command Prompt)
+
+**Simple Batch Processing:**
+```batch
+@echo off
+REM validate_all.bat
+
+for %%f in (fvtt_export\fvtt-Actor-*.json) do (
+    echo Validating: %%f
+    python validate_character.py "%%f"
+)
+```
+
+**Save Validation Reports:**
+```batch
+@echo off
+REM validate_and_log.bat
+
+if not exist validation_logs mkdir validation_logs
+
+for %%f in (fvtt_export\fvtt-Actor-*.json) do (
+    echo Validating: %%~nf
+    python validate_character.py "%%f" > "validation_logs\%%~nf_report.txt"
+)
+```
+
+**Combined Workflow:**
+```batch
+@echo off
+REM process_all.bat
+
+for %%f in (fvtt_export\fvtt-Actor-*.json) do (
+    echo Processing: %%~nxf
+
+    REM Validate
+    python validate_character.py "%%f" >nul 2>&1
+    if %ERRORLEVEL% EQU 0 (
+        echo   [OK] Validation passed
+    ) else (
+        echo   [WARN] Validation warnings found
+    )
+
+    REM Generate
+    python generate_character_sheet.py "%%f"
+    echo   [OK] Character sheet generated
+    echo.
+)
+```
+
+**Redirect stdout:**
+```batch
+REM Stdout to file
+python validate_character.py character.json > validation.log
+
+REM Both stdout and stderr to file
+python validate_character.py character.json > validation.log 2>&1
+
+REM Stdout to file, stderr to separate file
+python validate_character.py character.json > validation.log 2> errors.log
+```
+
 
 ## Generated Character Sheet Contents
 
