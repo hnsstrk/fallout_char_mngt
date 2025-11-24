@@ -1,0 +1,5 @@
+# Character exports (user-specific data)
+fvtt_export/*.json
+
+# Generated character sheets (user-specific output)
+character_sheets/*.md
