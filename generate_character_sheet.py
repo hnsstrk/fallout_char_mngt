@@ -34,7 +34,8 @@ except ImportError:
 try:
     from weasyprint import HTML
     WEASYPRINT_AVAILABLE = True
-except ImportError:
+except (ImportError, OSError):
+    # OSError occurs on Windows when GTK3 libraries are missing
     WEASYPRINT_AVAILABLE = False
 
 
