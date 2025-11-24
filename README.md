@@ -14,6 +14,14 @@ Generate comprehensive printable character sheets from FoundryVTT JSON exports f
 - FoundryVTT character export (JSON format)
 - Fallout 2d20 system (tested with v11.14.3 - v11.16.4)
 
+### Optional Dependencies (for HTML/PDF output)
+
+| Output Format | Required Packages |
+|---------------|-------------------|
+| Markdown | None (Python standard library) |
+| HTML | `jinja2` |
+| PDF | `jinja2`, `weasyprint` |
+
 ## Installation
 
 1. Clone this repository:
@@ -22,7 +30,12 @@ git clone https://github.com/hnsstrk/fallout_char_mngt.git
 cd fallout_char_mngt
 ```
 
-2. No additional dependencies required - uses Python standard library only.
+2. **For Markdown output**: No additional dependencies required.
+
+3. **For HTML/PDF output**: Install optional dependencies:
+```bash
+pip install -r requirements.txt
+```
 
 ## Usage
 
@@ -41,14 +54,35 @@ Run the generator script with your character JSON file:
 python generate_character_sheet.py fvtt_export/your-character-file.json
 ```
 
-The generated character sheet will be saved to `character_sheets/` as a Markdown file.
+The generated character sheet will be saved to `character_sheets/`.
+
+#### Output Formats
+
+Use the `--format` option to select output format:
+
+```bash
+# Markdown (default)
+python generate_character_sheet.py fvtt_export/character.json
+
+# HTML (styled, can be printed from browser)
+python generate_character_sheet.py fvtt_export/character.json --format html
+
+# PDF (print-ready)
+python generate_character_sheet.py fvtt_export/character.json --format pdf
+```
+
+| Format | Output | Best For |
+|--------|--------|----------|
+| `markdown` | `.md` file | Text editors, version control |
+| `html` | `.html` file | Browser viewing, custom CSS |
+| `pdf` | `.pdf` file | Printing, offline use |
 
 **Example:**
 ```bash
-python generate_character_sheet.py "fvtt_export/fvtt-Actor-character-name-ABC123XYZ.json"
+python generate_character_sheet.py "fvtt_export/fvtt-Actor-character-name-ABC123XYZ.json" --format pdf
 ```
 
-Output: `character_sheets/character_name.md`
+Output: `character_sheets/character_name.pdf`
 
 ### Validating Character Data
 
@@ -362,11 +396,11 @@ The generated Markdown character sheet includes:
 - **Data** - Character biography and background information
 
 ### Format Details
-- **Output Format**: Markdown (.md)
+- **Output Formats**: Markdown (.md), HTML (.html), PDF (.pdf)
 - **Tables**: Skills, S.P.E.C.I.A.L., Body Status
 - **Sections**: 14 organized sections for easy reference
 - **Descriptions**: All item and ability descriptions included in full
-- **Ready for**: Direct printing, PDF conversion, or viewing in any Markdown viewer
+- **HTML/PDF**: Print-optimized layout with CSS Grid, A4 page size
 
 ## Calculated Statistics
 
@@ -395,10 +429,12 @@ The tool supports both character types from the FVTT Fallout system:
 ```
 fallout_char_mngt/
 ├── fvtt_export/                    # Place your exported JSON files here
-├── character_sheets/               # Generated character sheets (Markdown)
+├── character_sheets/               # Generated character sheets (MD/HTML/PDF)
 ├── reference_data/                 # Calculation formulas and attribution
+├── templates/                      # HTML/CSS templates for PDF generation
 ├── generate_character_sheet.py    # Character sheet generator
 ├── validate_character.py           # Character data validation tool
+├── requirements.txt                # Optional dependencies for HTML/PDF
 ├── CLAUDE.md                       # Development guidance
 └── README.md                       # This file
 ```
@@ -441,10 +477,16 @@ See [`reference_data/SOURCE.md`](./reference_data/SOURCE.md) for complete attrib
 - Derived statistics calculation
 - Data validation and quality checks
 
+**Phase 2.1: Multi-Format Output** ✅ COMPLETED
+- HTML output with styled CSS layout
+- PDF generation via WeasyPrint
+- Print-optimized A4 layout
+- `--format` command-line option
+
 **Phase 3: Enhancement** (Future)
-- PDF generation
-- HTML output option
-- Batch processing for multiple characters
+- Web service for online conversion
+- Custom CSS themes
+- Layout optimization
 
 ## Development
 

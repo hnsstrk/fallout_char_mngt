@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ character.name }} - Character Sheet</title>
+    <style>
+        /* ===== BASE STYLES ===== */
+        :root {
+            --color-bg: #f5f5dc;
+            --color-bg-dark: #e8e4c9;
+            --color-border: #333;
+            --color-text: #1a1a1a;
+            --color-accent: #4a7c59;
+            --color-header: #2d2d2d;
+            --font-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            --font-mono: 'Consolas', 'Courier New', monospace;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-main);
+            font-size: 10pt;
+            line-height: 1.4;
+            color: var(--color-text);
+            background: var(--color-bg);
+        }
+
+        /* ===== PAGE LAYOUT ===== */
+        .character-sheet {
+            max-width: 210mm;
+            margin: 0 auto;
+            padding: 10mm;
+            background: white;
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 10px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid var(--color-header);
+            margin-bottom: 15px;
+        }
+
+        .header h1 {
+            font-size: 24pt;
+            font-weight: bold;
+            color: var(--color-header);
+            margin: 0;
+        }
+
+        .header-info {
+            display: flex;
+            gap: 20px;
+            font-size: 11pt;
+        }
+
+        .header-info .label {
+            color: #666;
+            font-size: 9pt;
+        }
+
+        .header-info .value {
+            font-weight: bold;
+        }
+
+        .header-stats {
+            text-align: right;
+        }
+
+        .xp-display {
+            font-family: var(--font-mono);
+            font-size: 12pt;
+        }
+
+        /* ===== TWO COLUMN LAYOUT ===== */
+        .two-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        /* ===== SECTION BOXES ===== */
+        .section {
+            border: 2px solid var(--color-border);
+            padding: 8px;
+            margin-bottom: 10px;
+            background: white;
+        }
+
+        .section h2 {
+            font-size: 11pt;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            background: var(--color-header);
+            color: white;
+            padding: 4px 8px;
+            margin: -8px -8px 8px -8px;
+        }
+
+        .section h3 {
+            font-size: 10pt;
+            font-weight: bold;
+            border-bottom: 1px solid var(--color-border);
+            padding-bottom: 3px;
+            margin: 10px 0 5px 0;
+        }
+
+        .section h3:first-of-type {
+            margin-top: 0;
+        }
+
+        /* ===== S.P.E.C.I.A.L. ATTRIBUTES ===== */
+        .special-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            text-align: center;
+        }
+
+        .special-box {
+            border: 2px solid var(--color-border);
+            padding: 5px;
+            background: var(--color-bg);
+        }
+
+        .special-box .attr-name {
+            font-size: 8pt;
+            font-weight: bold;
+            color: #666;
+        }
+
+        .special-box .attr-value {
+            font-size: 18pt;
+            font-weight: bold;
+            font-family: var(--font-mono);
+        }
+
+        /* ===== DERIVED STATS ===== */
+        .derived-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+
+        .stat-box {
+            border: 1px solid var(--color-border);
+            padding: 5px;
+            text-align: center;
+            background: var(--color-bg);
+        }
+
+        .stat-box .stat-name {
+            font-size: 8pt;
+            color: #666;
+        }
+
+        .stat-box .stat-value {
+            font-size: 14pt;
+            font-weight: bold;
+            font-family: var(--font-mono);
+        }
+
+        /* ===== CONDITIONS ===== */
+        .conditions-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 5px;
+        }
+
+        .condition-box {
+            border: 1px solid #999;
+            padding: 3px 5px;
+            text-align: center;
+            font-size: 9pt;
+        }
+
+        .condition-box.active {
+            background: var(--color-accent);
+            color: white;
+        }
+
+        /* ===== BODY STATUS ===== */
+        .body-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 5px;
+        }
+
+        .body-part {
+            border: 1px solid var(--color-border);
+            padding: 5px;
+            font-size: 9pt;
+        }
+
+        .body-part .part-name {
+            font-weight: bold;
+        }
+
+        .body-part .resistances {
+            font-family: var(--font-mono);
+            font-size: 8pt;
+            color: #666;
+        }
+
+        /* ===== SKILLS TABLE ===== */
+        .skills-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 9pt;
+        }
+
+        .skills-table th {
+            background: var(--color-bg-dark);
+            padding: 4px;
+            text-align: left;
+            font-size: 8pt;
+            border-bottom: 2px solid var(--color-border);
+        }
+
+        .skills-table td {
+            padding: 3px 4px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .skills-table .tag {
+            text-align: center;
+            color: var(--color-accent);
+            font-weight: bold;
+        }
+
+        .skills-table .rank {
+            text-align: center;
+            font-family: var(--font-mono);
+            font-weight: bold;
+        }
+
+        .skills-table .attr {
+            text-align: center;
+            font-size: 8pt;
+            color: #666;
+        }
+
+        /* ===== PERKS & TRAITS ===== */
+        .perk-item, .trait-item {
+            margin-bottom: 8px;
+            padding-bottom: 8px;
+            border-bottom: 1px dashed #ccc;
+        }
+
+        .perk-item:last-child, .trait-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .perk-name, .trait-name {
+            font-weight: bold;
+            font-size: 10pt;
+        }
+
+        .perk-rank {
+            color: #666;
+            font-size: 9pt;
+        }
+
+        .perk-description, .trait-description {
+            font-size: 9pt;
+            color: #333;
+            margin-top: 3px;
+        }
+
+        .perk-requirements {
+            font-size: 8pt;
+            color: #666;
+            font-style: italic;
+        }
+
+        /* ===== WEAPONS ===== */
+        .weapon-item {
+            margin-bottom: 10px;
+            padding: 8px;
+            border: 1px solid var(--color-border);
+            background: var(--color-bg);
+        }
+
+        .weapon-name {
+            font-weight: bold;
+            font-size: 11pt;
+        }
+
+        .weapon-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 5px;
+            margin-top: 5px;
+            font-size: 9pt;
+        }
+
+        .weapon-stats .stat-label {
+            font-size: 7pt;
+            color: #666;
+        }
+
+        .weapon-description {
+            font-size: 8pt;
+            color: #555;
+            margin-top: 5px;
+            padding-top: 5px;
+            border-top: 1px dashed #ccc;
+        }
+
+        /* ===== AMMUNITION ===== */
+        .ammo-list {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 5px;
+            font-size: 9pt;
+        }
+
+        .ammo-item {
+            padding: 3px 5px;
+            background: var(--color-bg);
+            border: 1px solid #ccc;
+        }
+
+        .ammo-qty {
+            font-family: var(--font-mono);
+            font-weight: bold;
+        }
+
+        /* ===== APPAREL ===== */
+        .apparel-item {
+            margin-bottom: 8px;
+            padding: 5px;
+            border: 1px solid #ccc;
+        }
+
+        .apparel-name {
+            font-weight: bold;
+        }
+
+        .apparel-details {
+            font-size: 8pt;
+            color: #666;
+        }
+
+        /* ===== CONSUMABLES & GEAR ===== */
+        .item-list {
+            columns: 2;
+            column-gap: 15px;
+        }
+
+        .item-entry {
+            break-inside: avoid;
+            margin-bottom: 8px;
+            padding-bottom: 5px;
+            border-bottom: 1px dotted #ccc;
+        }
+
+        .item-name {
+            font-weight: bold;
+            font-size: 9pt;
+        }
+
+        .item-qty {
+            color: #666;
+            font-size: 8pt;
+        }
+
+        .item-description {
+            font-size: 8pt;
+            color: #555;
+        }
+
+        /* ===== BIOGRAPHY ===== */
+        .biography {
+            font-size: 9pt;
+            line-height: 1.5;
+            white-space: pre-wrap;
+        }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            margin-top: 15px;
+            padding-top: 10px;
+            border-top: 1px solid #ccc;
+            font-size: 8pt;
+            color: #999;
+            text-align: center;
+        }
+
+        /* ===== PRINT STYLES ===== */
+        @media print {
+            body {
+                background: white;
+            }
+
+            .character-sheet {
+                max-width: none;
+                padding: 0;
+                margin: 0;
+            }
+
+            .section {
+                break-inside: avoid;
+            }
+
+            .no-print {
+                display: none;
+            }
+        }
+
+        @page {
+            size: A4;
+            margin: 10mm;
+        }
+
+        /* ===== UTILITY ===== */
+        .empty-section {
+            color: #999;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="character-sheet">
+        <!-- HEADER -->
+        <header class="header">
+            <div class="header-main">
+                <h1>{{ character.name }}</h1>
+                <div class="header-info">
+                    <div>
+                        <span class="label">Origin</span><br>
+                        <span class="value">{{ character.origin or 'Unknown' }}</span>
+                    </div>
+                    <div>
+                        <span class="label">Level</span><br>
+                        <span class="value">{{ character.level }}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="header-stats">
+                <div class="xp-display">
+                    XP: {{ derived.current_xp }} / {{ derived.next_level_xp }}
+                </div>
+            </div>
+        </header>
+
+        <!-- TOP ROW: SPECIAL + DERIVED STATS -->
+        <div class="two-columns">
+            <!-- S.P.E.C.I.A.L. -->
+            <div class="section">
+                <h2>S.P.E.C.I.A.L.</h2>
+                <div class="special-grid">
+                    <div class="special-box">
+                        <div class="attr-name">STR</div>
+                        <div class="attr-value">{{ attributes.str }}</div>
+                    </div>
+                    <div class="special-box">
+                        <div class="attr-name">PER</div>
+                        <div class="attr-value">{{ attributes.per }}</div>
+                    </div>
+                    <div class="special-box">
+                        <div class="attr-name">END</div>
+                        <div class="attr-value">{{ attributes.end }}</div>
+                    </div>
+                    <div class="special-box">
+                        <div class="attr-name">CHA</div>
+                        <div class="attr-value">{{ attributes.cha }}</div>
+                    </div>
+                    <div class="special-box">
+                        <div class="attr-name">INT</div>
+                        <div class="attr-value">{{ attributes.int }}</div>
+                    </div>
+                    <div class="special-box">
+                        <div class="attr-name">AGI</div>
+                        <div class="attr-value">{{ attributes.agi }}</div>
+                    </div>
+                    <div class="special-box">
+                        <div class="attr-name">LCK</div>
+                        <div class="attr-value">{{ attributes.lck }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DERIVED STATISTICS -->
+            <div class="section">
+                <h2>Derived Statistics</h2>
+                <div class="derived-grid">
+                    <div class="stat-box">
+                        <div class="stat-name">Health</div>
+                        <div class="stat-value">{{ derived.current_health }} / {{ derived.max_health }}</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-name">Defense</div>
+                        <div class="stat-value">{{ derived.defense }}</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-name">Initiative</div>
+                        <div class="stat-value">{{ derived.initiative }}</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-name">Melee Dmg</div>
+                        <div class="stat-value">+{{ derived.melee_damage }}</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-name">Carry</div>
+                        <div class="stat-value">{{ derived.carry_weight_current }} / {{ derived.carry_weight_total }}</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-name">Radiation</div>
+                        <div class="stat-value">{{ derived.radiation }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CONDITIONS + BODY STATUS -->
+        <div class="two-columns">
+            <!-- CONDITIONS -->
+            <div class="section">
+                <h2>Conditions</h2>
+                <div class="conditions-grid">
+                    <div class="condition-box">Hunger: {{ conditions.hunger }}</div>
+                    <div class="condition-box">Thirst: {{ conditions.thirst }}</div>
+                    <div class="condition-box">Sleep: {{ conditions.sleep }}</div>
+                    <div class="condition-box">Fatigue: {{ conditions.fatigue }}</div>
+                    <div class="condition-box">Intox: {{ conditions.intoxication }}</div>
+                    <div class="condition-box{% if conditions.alcoholic %} active{% endif %}">Alcoholic: {{ 'Yes' if conditions.alcoholic else 'No' }}</div>
+                    <div class="condition-box{% if conditions.well_rested %} active{% endif %}">Well Rested: {{ 'Yes' if conditions.well_rested else 'No' }}</div>
+                </div>
+            </div>
+
+            <!-- BODY STATUS -->
+            <div class="section">
+                <h2>Body Status</h2>
+                <div class="body-grid">
+                    {% for part in body_parts %}
+                    <div class="body-part">
+                        <span class="part-name">{{ part.name }}</span>
+                        <span class="resistances">E{{ part.energy }}/P{{ part.physical }}/Po{{ part.poison }}/R{{ part.radiation }}</span>
+                        {% if part.injuries %}<br><small>{{ part.injuries }}</small>{% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- SKILLS -->
+        <div class="section">
+            <h2>Skills</h2>
+            <table class="skills-table">
+                <thead>
+                    <tr>
+                        <th>Skill</th>
+                        <th style="width: 30px;">Tag</th>
+                        <th style="width: 40px;">Rank</th>
+                        <th style="width: 40px;">Attr</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for skill in skills %}
+                    <tr>
+                        <td>{{ skill.name }}</td>
+                        <td class="tag">{{ '✓' if skill.tag else '' }}</td>
+                        <td class="rank">{{ skill.rank }}</td>
+                        <td class="attr">{{ skill.attribute }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- PERKS + TRAITS -->
+        <div class="two-columns">
+            <!-- PERKS -->
+            <div class="section">
+                <h2>Perks</h2>
+                {% if perks %}
+                    {% for perk in perks %}
+                    <div class="perk-item">
+                        <span class="perk-name">{{ perk.name }}</span>
+                        {% if perk.rank > 1 %}<span class="perk-rank">(Rank {{ perk.rank }})</span>{% endif %}
+                        {% if perk.description %}
+                        <div class="perk-description">{{ perk.description }}</div>
+                        {% endif %}
+                        {% if perk.requirements %}
+                        <div class="perk-requirements">Req: {{ perk.requirements }}</div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="empty-section">None</p>
+                {% endif %}
+            </div>
+
+            <!-- TRAITS -->
+            <div class="section">
+                <h2>Traits</h2>
+                {% if traits %}
+                    {% for trait in traits %}
+                    <div class="trait-item">
+                        <span class="trait-name">{{ trait.name }}</span>
+                        {% if trait.description %}
+                        <div class="trait-description">{{ trait.description }}</div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="empty-section">None</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- ADDICTIONS + DISEASES -->
+        <div class="two-columns">
+            <div class="section">
+                <h2>Addictions</h2>
+                {% if addictions %}
+                    {% for addiction in addictions %}
+                    <div>{{ addiction.name }}</div>
+                    {% endfor %}
+                {% else %}
+                    <p class="empty-section">None</p>
+                {% endif %}
+            </div>
+            <div class="section">
+                <h2>Diseases</h2>
+                {% if diseases %}
+                    {% for disease in diseases %}
+                    <div>{{ disease.name }}</div>
+                    {% endfor %}
+                {% else %}
+                    <p class="empty-section">None</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- WEAPONS -->
+        <div class="section">
+            <h2>Weapons</h2>
+            {% if weapons %}
+                {% for weapon in weapons %}
+                <div class="weapon-item">
+                    <div class="weapon-name">{{ weapon.name }}</div>
+                    <div class="weapon-stats">
+                        <div>
+                            <span class="stat-label">Damage</span><br>
+                            <strong>{{ weapon.damage }} {{ weapon.damage_type }}</strong>
+                        </div>
+                        <div>
+                            <span class="stat-label">Fire Rate</span><br>
+                            <strong>{{ weapon.fire_rate or '-' }}</strong>
+                        </div>
+                        <div>
+                            <span class="stat-label">Range</span><br>
+                            <strong>{{ weapon.range or '-' }}</strong>
+                        </div>
+                        <div>
+                            <span class="stat-label">Qualities</span><br>
+                            {{ weapon.qualities or '-' }}
+                        </div>
+                    </div>
+                    {% if weapon.description %}
+                    <div class="weapon-description">{{ weapon.description }}</div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            {% else %}
+                <p class="empty-section">None</p>
+            {% endif %}
+
+            {% if ammo %}
+            <h3>Ammunition</h3>
+            <div class="ammo-list">
+                {% for item in ammo %}
+                <div class="ammo-item">
+                    {{ item.name }} <span class="ammo-qty">x{{ item.quantity }}</span>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- APPAREL -->
+        <div class="section">
+            <h2>Apparel</h2>
+            {% if apparel %}
+                {% for item in apparel %}
+                <div class="apparel-item">
+                    <div class="apparel-name">{{ item.name }}</div>
+                    <div class="apparel-details">
+                        {% if item.locations %}Covers: {{ item.locations }}{% endif %}
+                        {% if item.resistances %} | {{ item.resistances }}{% endif %}
+                    </div>
+                    {% if item.description %}
+                    <div class="item-description">{{ item.description }}</div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            {% else %}
+                <p class="empty-section">None</p>
+            {% endif %}
+        </div>
+
+        <!-- CONSUMABLES + GEAR -->
+        <div class="two-columns">
+            <!-- CONSUMABLES -->
+            <div class="section">
+                <h2>Consumables</h2>
+                {% if consumables %}
+                <div class="item-list">
+                    {% for item in consumables %}
+                    <div class="item-entry">
+                        <span class="item-name">{{ item.name }}</span>
+                        {% if item.quantity > 1 %}<span class="item-qty">(x{{ item.quantity }})</span>{% endif %}
+                        {% if item.description %}
+                        <div class="item-description">{{ item.description }}</div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                    <p class="empty-section">None</p>
+                {% endif %}
+            </div>
+
+            <!-- GEAR -->
+            <div class="section">
+                <h2>Gear & Miscellany</h2>
+                {% if gear %}
+                <div class="item-list">
+                    {% for item in gear %}
+                    <div class="item-entry">
+                        <span class="item-name">{{ item.name }}</span>
+                        {% if item.quantity > 1 %}<span class="item-qty">(x{{ item.quantity }})</span>{% endif %}
+                        {% if item.type_label %}<span class="item-qty">- {{ item.type_label }}</span>{% endif %}
+                        {% if item.description %}
+                        <div class="item-description">{{ item.description }}</div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                    <p class="empty-section">None</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- BIOGRAPHY -->
+        {% if biography %}
+        <div class="section">
+            <h2>Data</h2>
+            <div class="biography">{{ biography }}</div>
+        </div>
+        {% endif %}
+
+        <!-- FOOTER -->
+        <footer class="footer">
+            Generated on {{ generated_date }} |
+            <a href="https://github.com/hnsstrk/fallout_char_mngt">Fallout Character Management</a>
+        </footer>
+    </div>
+</body>
+</html>
