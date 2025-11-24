@@ -756,9 +756,15 @@ class CharacterSheetGenerator:
         result = []
         for perk in sorted(perks, key=lambda p: p.get('name', '')):
             desc = perk.get('system', {}).get('description', '')
+            # rank can be a dict {"value": 1, "max": 1, ...} or an int
+            rank_data = perk.get('system', {}).get('rank', 1)
+            if isinstance(rank_data, dict):
+                rank = rank_data.get('value', 1)
+            else:
+                rank = rank_data if rank_data else 1
             result.append({
                 'name': perk.get('name', 'Unknown'),
-                'rank': perk.get('system', {}).get('rank', 1),
+                'rank': rank,
                 'description': self.strip_html(desc) if desc else '',
             })
         return result
@@ -782,10 +788,19 @@ class CharacterSheetGenerator:
         for weapon in weapons:
             sys = weapon.get('system', {})
             damage = sys.get('damage', {})
+
+            # damageType is a dict like {"energy": true, "physical": false, ...}
+            damage_type_dict = damage.get('damageType', {})
+            if isinstance(damage_type_dict, dict):
+                damage_types = [k for k, v in damage_type_dict.items() if v]
+                damage_type = '/'.join(t[:3].upper() for t in damage_types) if damage_types else ''
+            else:
+                damage_type = str(damage_type_dict).upper()[:3] if damage_type_dict else ''
+
             result.append({
                 'name': weapon.get('name', 'Unknown'),
                 'damage': damage.get('rating', 0),
-                'damage_type': damage.get('damageType', '').upper()[:3],
+                'damage_type': damage_type,
                 'range': sys.get('range', ''),
                 'fire_rate': sys.get('fireRate', ''),
                 'qualities': ', '.join(q.get('name', '') for q in sys.get('qualities', [])) or '',
