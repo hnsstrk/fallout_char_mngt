@@ -2,64 +2,33 @@
 """
 Fallout Character Sheet Generator
 
-Generates comprehensive character sheets from FVTT Fallout character JSON exports.
-Supports multiple output formats: Markdown, HTML, and PDF.
+Generates comprehensive Markdown character sheets from FVTT Fallout character JSON exports.
 Includes all stats, skills, perks, equipment, and descriptions needed for offline gameplay.
 
 Usage:
-    python generate_character_sheet.py <character_json_file> [--format FORMAT]
-    python generate_character_sheet.py fvtt_export/character.json --format pdf
-
-Formats:
-    markdown (default) - Plain text Markdown file
-    html               - Styled HTML file (can be printed from browser)
-    pdf                - Print-ready PDF file (requires weasyprint)
+    python generate_character_sheet.py <character_json_file>
+    python generate_character_sheet.py fvtt_export/fvtt-Actor-dr.-eloise-'ellie'-harper-jkTOphZz7Tvl7Qqn.json
 """
 
 import json
 import sys
-import argparse
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 from datetime import datetime
 import re
 
-# Optional dependencies for HTML/PDF output
-try:
-    from jinja2 import Environment, FileSystemLoader
-    JINJA2_AVAILABLE = True
-except ImportError:
-    JINJA2_AVAILABLE = False
-
-try:
-    from weasyprint import HTML
-    WEASYPRINT_AVAILABLE = True
-except (ImportError, OSError):
-    # OSError occurs on Windows when GTK3 libraries are missing
-    WEASYPRINT_AVAILABLE = False
-
 
 class CharacterSheetGenerator:
-    """Generates character sheets from FVTT Fallout character JSON.
+    """Generates Markdown character sheets from FVTT Fallout character JSON."""
 
-    Supports multiple output formats:
-    - markdown: Plain text Markdown (default, no dependencies)
-    - html: Styled HTML with CSS (requires jinja2)
-    - pdf: Print-ready PDF (requires jinja2 + weasyprint)
-    """
-
-    def __init__(self, character_file: Path, output_format: str = 'markdown'):
+    def __init__(self, character_file: Path):
         self.character_file = character_file
-        self.output_format = output_format
         self.character_data = None
         self.character_name = None
         self.character_type = None
         self.character_level = None
         self.formulas = None
         self.derived_stats = {}
-
-        # Template directory for HTML/PDF output
-        self.template_dir = Path(__file__).parent / 'templates'
 
     def load_character(self):
         """Load character JSON file."""
@@ -578,9 +547,13 @@ class CharacterSheetGenerator:
             res_r = part_resistance.get('radiation', 0) + global_r + equip_res['radiation']
             res_po = part_resistance.get('poison', 0) + global_po + equip_res['poison']
 
+            # Convert 999+ to infinity symbol (immune)
+            def fmt_res(val: int) -> str:
+                return '∞' if val >= 999 else str(val)
+
             injury_str = f"{injuries_open} open, {injuries_treated} treated" if (injuries_open + injuries_treated) > 0 else "None"
 
-            md += f"| {name} | {status.capitalize()} | {injury_str} | {res_e}/{res_p}/{res_po}/{res_r} |\n"
+            md += f"| {name} | {status.capitalize()} | {injury_str} | {fmt_res(res_e)}/{fmt_res(res_p)}/{fmt_res(res_po)}/{fmt_res(res_r)} |\n"
 
         md += "\n"
         return md
@@ -613,275 +586,6 @@ class CharacterSheetGenerator:
         md += self.format_description(biography) + "\n\n"
 
         return md
-
-    # ========== HTML/PDF TEMPLATE METHODS ==========
-
-    def prepare_template_context(self) -> Dict[str, Any]:
-        """Prepare all data for the HTML/PDF template."""
-        system = self.character_data.get('system', {})
-        items = self.character_data.get('items', [])
-
-        # Extract attributes
-        attrs = system.get('attributes', {})
-
-        # Prepare context dictionary
-        context = {
-            'character': {
-                'name': self.character_name,
-                'origin': system.get('origin', ''),
-                'level': self.character_level,
-                'type': self.character_type,
-            },
-            'attributes': {
-                'str': attrs.get('str', {}).get('value', 0),
-                'per': attrs.get('per', {}).get('value', 0),
-                'end': attrs.get('end', {}).get('value', 0),
-                'cha': attrs.get('cha', {}).get('value', 0),
-                'int': attrs.get('int', {}).get('value', 0),
-                'agi': attrs.get('agi', {}).get('value', 0),
-                'lck': attrs.get('luc', {}).get('value', 0),
-            },
-            'derived': self.derived_stats,
-            'conditions': self._extract_conditions(system),
-            'body_parts': self._extract_body_parts(system, items),
-            'skills': self._extract_skills(items),
-            'perks': self._extract_perks(items),
-            'traits': self._extract_traits(items),
-            'addictions': [],  # Placeholder for future implementation
-            'diseases': [],    # Placeholder for future implementation
-            'weapons': self._extract_weapons(items),
-            'ammo': self._extract_ammo(items),
-            'apparel': self._extract_apparel(items),
-            'consumables': self._extract_consumables(items),
-            'gear': self._extract_gear(items),
-            'biography': self.strip_html(system.get('biography', '')),
-            'generated_date': datetime.now().strftime('%Y-%m-%d %H:%M'),
-        }
-
-        return context
-
-    def _extract_conditions(self, system: Dict) -> Dict:
-        """Extract conditions data for template."""
-        conditions = system.get('conditions', {})
-        return {
-            'hunger': conditions.get('hunger', 0),
-            'thirst': conditions.get('thirst', 0),
-            'sleep': conditions.get('sleep', 0),
-            'fatigue': conditions.get('fatigue', 0),
-            'intoxication': conditions.get('intoxication', 0),
-            'alcoholic': conditions.get('alcoholic', False),
-            'well_rested': conditions.get('wellRested', False),
-        }
-
-    def _extract_body_parts(self, system: Dict, items: List) -> List[Dict]:
-        """Extract body parts with combined resistances for template."""
-        body_parts_data = system.get('body_parts', {})
-        global_res = system.get('resistance', {})
-
-        # Calculate equipment resistances per body part
-        equip_res = {part: {'physical': 0, 'energy': 0, 'radiation': 0, 'poison': 0}
-                     for part in ['head', 'torso', 'armL', 'armR', 'legL', 'legR']}
-
-        for item in items:
-            if item.get('type') != 'apparel':
-                continue
-            item_sys = item.get('system', {})
-            if not item_sys.get('equipped', False):
-                continue
-            res = item_sys.get('resistance', {})
-            loc = item_sys.get('location', {})
-            for part_key, is_covered in loc.items():
-                if is_covered and part_key in equip_res:
-                    equip_res[part_key]['physical'] += res.get('physical', 0)
-                    equip_res[part_key]['energy'] += res.get('energy', 0)
-                    equip_res[part_key]['radiation'] += res.get('radiation', 0)
-                    equip_res[part_key]['poison'] += res.get('poison', 0)
-
-        part_names = {
-            'head': 'Head', 'torso': 'Torso', 'armL': 'Left Arm',
-            'armR': 'Right Arm', 'legL': 'Left Leg', 'legR': 'Right Leg'
-        }
-
-        result = []
-        for part_key in ['head', 'torso', 'armL', 'armR', 'legL', 'legR']:
-            if part_key not in body_parts_data:
-                continue
-            part = body_parts_data[part_key]
-            part_res = part.get('resistance', {})
-            eq = equip_res[part_key]
-
-            injuries_open = part.get('injuryOpenCount', 0)
-            injuries_treated = part.get('injuryTreatedCount', 0)
-            injuries = f"{injuries_open} open, {injuries_treated} treated" if (injuries_open + injuries_treated) > 0 else ""
-
-            # Calculate total resistances
-            phys = part_res.get('physical', 0) + global_res.get('physical', 0) + eq['physical']
-            energy = part_res.get('energy', 0) + global_res.get('energy', 0) + eq['energy']
-            rad = part_res.get('radiation', 0) + global_res.get('radiation', 0) + eq['radiation']
-            poison = part_res.get('poison', 0) + global_res.get('poison', 0) + eq['poison']
-
-            # Convert 999+ to infinity symbol (immune)
-            def fmt_res(val: int) -> str:
-                return '∞' if val >= 999 else str(val)
-
-            result.append({
-                'name': part_names.get(part_key, part_key),
-                'status': part.get('status', 'healthy').capitalize(),
-                'injuries': injuries,
-                'physical': fmt_res(phys),
-                'energy': fmt_res(energy),
-                'radiation': fmt_res(rad),
-                'poison': fmt_res(poison),
-            })
-
-        return result
-
-    def _extract_skills(self, items: List) -> List[Dict]:
-        """Extract skills for template."""
-        skills = [item for item in items if item.get('type') == 'skill']
-        result = []
-        for skill in sorted(skills, key=lambda s: s.get('name', '')):
-            tag_field = skill.get('system', {}).get('tag', False)
-            if isinstance(tag_field, bool):
-                tag_value = tag_field
-            else:
-                tag_value = tag_field.get('value', False) if isinstance(tag_field, dict) else False
-
-            result.append({
-                'name': skill.get('name', 'Unknown'),
-                'rank': skill.get('system', {}).get('value', 0),
-                'tag': tag_value,
-                'attribute': skill.get('system', {}).get('defaultAttribute', '').upper(),
-            })
-        return result
-
-    def _extract_perks(self, items: List) -> List[Dict]:
-        """Extract perks for template."""
-        perks = [item for item in items if item.get('type') == 'perk']
-        result = []
-        for perk in sorted(perks, key=lambda p: p.get('name', '')):
-            result.append({
-                'name': perk.get('name', 'Unknown'),
-                'rank': perk.get('system', {}).get('rank', {}).get('value', 1),
-                'description': self.strip_html(perk.get('system', {}).get('description', '')),
-                'requirements': self.strip_html(perk.get('system', {}).get('requirements', '')),
-            })
-        return result
-
-    def _extract_traits(self, items: List) -> List[Dict]:
-        """Extract traits for template."""
-        traits = [item for item in items if item.get('type') == 'trait']
-        result = []
-        for trait in traits:
-            result.append({
-                'name': trait.get('name', 'Unknown'),
-                'description': self.strip_html(trait.get('system', {}).get('description', '')),
-            })
-        return result
-
-    def _extract_weapons(self, items: List) -> List[Dict]:
-        """Extract weapons for template."""
-        weapons = [item for item in items if item.get('type') == 'weapon']
-        result = []
-        for weapon in sorted(weapons, key=lambda w: w.get('name', '')):
-            sys = weapon.get('system', {})
-            result.append({
-                'name': weapon.get('name', 'Unknown'),
-                'damage': sys.get('damage', {}).get('rating', 0),
-                'damage_type': sys.get('damage', {}).get('type', ''),
-                'fire_rate': sys.get('fireRate', 0),
-                'range': sys.get('range', ''),
-                'qualities': self.strip_html(sys.get('qualities', '')),
-                'effects': self.strip_html(sys.get('effects', '')),
-                'description': self.strip_html(sys.get('description', '')),
-            })
-        return result
-
-    def _extract_ammo(self, items: List) -> List[Dict]:
-        """Extract ammunition for template."""
-        ammo = [item for item in items if item.get('type') == 'ammo']
-        result = []
-        for item in sorted(ammo, key=lambda a: a.get('name', '')):
-            result.append({
-                'name': item.get('name', 'Unknown'),
-                'quantity': item.get('system', {}).get('quantity', 1),
-            })
-        return result
-
-    def _extract_apparel(self, items: List) -> List[Dict]:
-        """Extract apparel for template."""
-        apparel = [item for item in items if item.get('type') == 'apparel']
-        result = []
-        for item in sorted(apparel, key=lambda a: a.get('name', '')):
-            sys = item.get('system', {})
-            locations = sys.get('location', {})
-            covered = [part.upper() for part, val in locations.items() if val]
-            res = sys.get('resistance', {})
-            res_parts = []
-            if res.get('physical', 0): res_parts.append(f"P+{res['physical']}")
-            if res.get('energy', 0): res_parts.append(f"E+{res['energy']}")
-            if res.get('radiation', 0): res_parts.append(f"R+{res['radiation']}")
-            if res.get('poison', 0): res_parts.append(f"Po+{res['poison']}")
-
-            result.append({
-                'name': item.get('name', 'Unknown'),
-                'locations': ', '.join(covered) if covered else '',
-                'resistances': ', '.join(res_parts) if res_parts else '',
-                'description': self.strip_html(sys.get('description', '')),
-            })
-        return result
-
-    def _extract_consumables(self, items: List) -> List[Dict]:
-        """Extract consumables for template."""
-        consumables = [item for item in items if item.get('type') == 'consumable']
-        result = []
-        for item in sorted(consumables, key=lambda c: c.get('name', '')):
-            result.append({
-                'name': item.get('name', 'Unknown'),
-                'quantity': item.get('system', {}).get('quantity', 1),
-                'description': self.strip_html(item.get('system', {}).get('description', '')),
-            })
-        return result
-
-    def _extract_gear(self, items: List) -> List[Dict]:
-        """Extract miscellaneous gear for template."""
-        gear = [item for item in items if item.get('type') in ['miscellany', 'books_and_magz']]
-        result = []
-        for item in sorted(gear, key=lambda m: (m.get('type', ''), m.get('name', ''))):
-            result.append({
-                'name': item.get('name', 'Unknown'),
-                'quantity': item.get('system', {}).get('quantity', 1),
-                'type_label': 'Book/Magazine' if item.get('type') == 'books_and_magz' else '',
-                'description': self.strip_html(item.get('system', {}).get('description', '')),
-            })
-        return result
-
-    def generate_html(self) -> str:
-        """Generate HTML character sheet using Jinja2 template."""
-        if not JINJA2_AVAILABLE:
-            print("Error: jinja2 is required for HTML output.")
-            print("Install with: pip install jinja2")
-            sys.exit(1)
-
-        if not self.template_dir.exists():
-            print(f"Error: Template directory not found: {self.template_dir}")
-            sys.exit(1)
-
-        env = Environment(loader=FileSystemLoader(self.template_dir))
-        template = env.get_template('character_sheet.html')
-
-        context = self.prepare_template_context()
-        return template.render(**context)
-
-    def generate_pdf(self, output_file: Path) -> None:
-        """Generate PDF character sheet using WeasyPrint."""
-        if not WEASYPRINT_AVAILABLE:
-            print("Error: weasyprint is required for PDF output.")
-            print("Install with: pip install weasyprint")
-            sys.exit(1)
-
-        html_content = self.generate_html()
-        HTML(string=html_content, base_url=str(self.template_dir)).write_pdf(output_file)
 
     def generate_character_sheet(self) -> str:
         """Generate complete character sheet."""
@@ -921,33 +625,19 @@ class CharacterSheetGenerator:
         # Calculate
         self.calculate_derived_statistics()
 
-        # Setup output
+        # Generate
+        print(f"\nGenerating character sheet...")
+        sheet = self.generate_character_sheet()
+
+        # Save to character_sheets/ directory
         output_dir = Path('character_sheets')
         output_dir.mkdir(exist_ok=True)
+
         safe_name = self.character_name.lower().replace(' ', '_').replace('.', '').replace("'", '').replace('"', '')
+        output_file = output_dir / f"{safe_name}.md"
 
-        # Generate based on format
-        print(f"\nGenerating {self.output_format.upper()} character sheet...")
-
-        if self.output_format == 'markdown':
-            sheet = self.generate_character_sheet()
-            output_file = output_dir / f"{safe_name}.md"
-            with open(output_file, 'w', encoding='utf-8') as f:
-                f.write(sheet)
-
-        elif self.output_format == 'html':
-            html = self.generate_html()
-            output_file = output_dir / f"{safe_name}.html"
-            with open(output_file, 'w', encoding='utf-8') as f:
-                f.write(html)
-
-        elif self.output_format == 'pdf':
-            output_file = output_dir / f"{safe_name}.pdf"
-            self.generate_pdf(output_file)
-
-        else:
-            print(f"Error: Unknown format '{self.output_format}'")
-            sys.exit(1)
+        with open(output_file, 'w', encoding='utf-8') as f:
+            f.write(sheet)
 
         print(f"[OK] Generated: {output_file}")
         print(f"\n{'='*60}")
@@ -956,42 +646,19 @@ class CharacterSheetGenerator:
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        description='Generate character sheets from FVTT Fallout JSON exports.',
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog="""
-Examples:
-  python generate_character_sheet.py fvtt_export/character.json
-  python generate_character_sheet.py fvtt_export/character.json --format html
-  python generate_character_sheet.py fvtt_export/character.json --format pdf
-
-Output formats:
-  markdown  Plain text Markdown file (default, no dependencies)
-  html      Styled HTML file (requires: pip install jinja2)
-  pdf       Print-ready PDF (requires: pip install jinja2 weasyprint)
-        """
-    )
-
-    parser.add_argument(
-        'character_file',
-        type=Path,
-        help='Path to the FVTT character JSON file'
-    )
-
-    parser.add_argument(
-        '-f', '--format',
-        choices=['markdown', 'html', 'pdf'],
-        default='markdown',
-        help='Output format (default: markdown)'
-    )
-
-    args = parser.parse_args()
-
-    if not args.character_file.exists():
-        print(f"Error: File not found: {args.character_file}")
+    if len(sys.argv) < 2:
+        print("Usage: python generate_character_sheet.py <character_json_file>")
+        print("\nExample:")
+        print("  python generate_character_sheet.py fvtt_export/fvtt-Actor-dr.-eloise-'ellie'-harper-jkTOphZz7Tvl7Qqn.json")
         sys.exit(1)
 
-    generator = CharacterSheetGenerator(args.character_file, args.format)
+    character_file = Path(sys.argv[1])
+
+    if not character_file.exists():
+        print(f"Error: File not found: {character_file}")
+        sys.exit(1)
+
+    generator = CharacterSheetGenerator(character_file)
     generator.run()
 
 

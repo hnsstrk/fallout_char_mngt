@@ -13,64 +13,7 @@ Generate comprehensive printable character sheets from FoundryVTT JSON exports f
 - Python 3.6+
 - FoundryVTT character export (JSON format)
 - Fallout 2d20 system (tested with v11.14.3 - v11.16.4)
-
-### Optional Dependencies (for HTML/PDF output)
-
-| Output Format | Required Packages |
-|---------------|-------------------|
-| Markdown | None (Python standard library) |
-| HTML | `jinja2` |
-| PDF | `jinja2`, `weasyprint` |
-
-### Platform Compatibility
-
-| Platform | Markdown | HTML | PDF |
-|----------|----------|------|-----|
-| Linux | ✅ | ✅ | ✅ |
-| macOS | ✅ | ✅ | ✅ |
-| Windows (native) | ✅ | ✅ | ❌ |
-| Windows (WSL) | ✅ | ✅ | ✅ |
-
-**PDF output on Windows:** WeasyPrint requires GTK3 and Pango libraries, which are not available natively on Windows. For PDF generation on Windows, use **WSL (Windows Subsystem for Linux)**.
-
-#### WSL Setup for Windows Users
-
-1. **Install WSL** (if not already installed):
-   ```powershell
-   wsl --install
-   ```
-   Restart your computer after installation.
-
-2. **Open WSL terminal** and navigate to your project:
-   ```bash
-   cd /mnt/c/Users/YourName/path/to/fallout_char_mngt
-   ```
-
-3. **Install Python venv package**:
-   ```bash
-   sudo apt update
-   sudo apt install python3.12-venv
-   ```
-
-4. **Create virtual environment in Linux filesystem** (required - venv on Windows mounts doesn't work correctly):
-   ```bash
-   python3 -m venv ~/fallout_venv
-   source ~/fallout_venv/bin/activate
-   pip install -r requirements.txt
-   ```
-
-5. **Generate PDF** from within WSL (with venv activated):
-   ```bash
-   python generate_character_sheet.py fvtt_export/character.json --format pdf
-   ```
-
-**For future sessions**, activate the venv before running:
-```bash
-cd /mnt/c/Users/YourName/path/to/fallout_char_mngt
-source ~/fallout_venv/bin/activate
-```
-
-**Alternative for Windows without WSL:** Use `--format html` and print to PDF from your browser. Note that browser printing does not support page headers, footers, or automatic page numbers.
+- No external dependencies (uses Python standard library only)
 
 ## Installation
 
@@ -80,12 +23,7 @@ git clone https://github.com/hnsstrk/fallout_char_mngt.git
 cd fallout_char_mngt
 ```
 
-2. **For Markdown output**: No additional dependencies required.
-
-3. **For HTML/PDF output**: Install optional dependencies:
-```bash
-pip install -r requirements.txt
-```
+2. No additional installation required - the tool uses only Python standard library.
 
 ## Usage
 
@@ -104,35 +42,14 @@ Run the generator script with your character JSON file:
 python generate_character_sheet.py fvtt_export/your-character-file.json
 ```
 
-The generated character sheet will be saved to `character_sheets/`.
-
-#### Output Formats
-
-Use the `--format` option to select output format:
-
-```bash
-# Markdown (default)
-python generate_character_sheet.py fvtt_export/character.json
-
-# HTML (styled, can be printed from browser)
-python generate_character_sheet.py fvtt_export/character.json --format html
-
-# PDF (print-ready)
-python generate_character_sheet.py fvtt_export/character.json --format pdf
-```
-
-| Format | Output | Best For |
-|--------|--------|----------|
-| `markdown` | `.md` file | Text editors, version control |
-| `html` | `.html` file | Browser viewing, custom CSS |
-| `pdf` | `.pdf` file | Printing, offline use |
+The generated character sheet will be saved to `character_sheets/` as a Markdown file.
 
 **Example:**
 ```bash
-python generate_character_sheet.py "fvtt_export/fvtt-Actor-character-name-ABC123XYZ.json" --format pdf
+python generate_character_sheet.py "fvtt_export/fvtt-Actor-character-name-ABC123XYZ.json"
 ```
 
-Output: `character_sheets/character_name.pdf`
+Output: `character_sheets/character_name.md`
 
 ### Validating Character Data
 
@@ -446,11 +363,10 @@ The generated Markdown character sheet includes:
 - **Data** - Character biography and background information
 
 ### Format Details
-- **Output Formats**: Markdown (.md), HTML (.html), PDF (.pdf)
+- **Output Format**: Markdown (.md)
 - **Tables**: Skills, S.P.E.C.I.A.L., Body Status
 - **Sections**: 14 organized sections for easy reference
 - **Descriptions**: All item and ability descriptions included in full
-- **HTML/PDF**: Print-optimized layout with CSS Grid, A4 page size
 
 ## Calculated Statistics
 
@@ -479,12 +395,10 @@ The tool supports both character types from the FVTT Fallout system:
 ```
 fallout_char_mngt/
 ├── fvtt_export/                    # Place your exported JSON files here
-├── character_sheets/               # Generated character sheets (MD/HTML/PDF)
+├── character_sheets/               # Generated character sheets (Markdown)
 ├── reference_data/                 # Calculation formulas and attribution
-├── templates/                      # HTML/CSS templates for PDF generation
 ├── generate_character_sheet.py    # Character sheet generator
 ├── validate_character.py           # Character data validation tool
-├── requirements.txt                # Optional dependencies for HTML/PDF
 ├── CLAUDE.md                       # Development guidance
 └── README.md                       # This file
 ```
@@ -527,15 +441,8 @@ See [`reference_data/SOURCE.md`](./reference_data/SOURCE.md) for complete attrib
 - Derived statistics calculation
 - Data validation and quality checks
 
-**Phase 2.1: Multi-Format Output** ✅ COMPLETED
-- HTML output with styled CSS layout
-- PDF generation via WeasyPrint
-- Print-optimized A4 layout
-- `--format` command-line option
-
 **Phase 3: Enhancement** (Future)
-- Web service for online conversion
-- Custom CSS themes
+- PDF output via alternative approach
 - Layout optimization
 
 ## Development
