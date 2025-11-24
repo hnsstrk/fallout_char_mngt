@@ -22,6 +22,44 @@ Generate comprehensive printable character sheets from FoundryVTT JSON exports f
 | HTML | `jinja2` |
 | PDF | `jinja2`, `weasyprint` |
 
+### Platform Compatibility
+
+| Platform | Markdown | HTML | PDF |
+|----------|----------|------|-----|
+| Linux | ✅ | ✅ | ✅ |
+| macOS | ✅ | ✅ | ✅ |
+| Windows (native) | ✅ | ✅ | ❌ |
+| Windows (WSL) | ✅ | ✅ | ✅ |
+
+**PDF output on Windows:** WeasyPrint requires GTK3 and Pango libraries, which are not available natively on Windows. For PDF generation on Windows, use **WSL (Windows Subsystem for Linux)**.
+
+#### WSL Setup for Windows Users
+
+1. **Install WSL** (if not already installed):
+   ```powershell
+   wsl --install
+   ```
+   Restart your computer after installation.
+
+2. **Open WSL terminal** and navigate to your project:
+   ```bash
+   cd /mnt/c/Users/YourName/path/to/fallout_char_mngt
+   ```
+
+3. **Install Python and dependencies in WSL**:
+   ```bash
+   sudo apt update
+   sudo apt install python3 python3-pip
+   pip3 install -r requirements.txt
+   ```
+
+4. **Generate PDF** from within WSL:
+   ```bash
+   python3 generate_character_sheet.py fvtt_export/character.json --format pdf
+   ```
+
+**Alternative for Windows without WSL:** Use `--format html` and print to PDF from your browser. Note that browser printing does not support page headers, footers, or automatic page numbers.
+
 ## Installation
 
 1. Clone this repository:
