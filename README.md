@@ -13,7 +13,13 @@ Generate comprehensive printable character sheets from FoundryVTT JSON exports f
 - Python 3.6+
 - FoundryVTT character export (JSON format)
 - Fallout 2d20 system (tested with v11.14.3 - v11.16.4)
-- No external dependencies (uses Python standard library only)
+
+### Optional Dependencies
+
+| Output Format | Required Packages |
+|---------------|-------------------|
+| Markdown | None (Python standard library) |
+| HTML | `jinja2` |
 
 ## Installation
 
@@ -23,7 +29,12 @@ git clone https://github.com/hnsstrk/fallout_char_mngt.git
 cd fallout_char_mngt
 ```
 
-2. No additional installation required - the tool uses only Python standard library.
+2. **For Markdown output**: No additional installation required.
+
+3. **For HTML output**: Install optional dependencies:
+```bash
+pip install -r requirements.txt
+```
 
 ## Usage
 
@@ -42,14 +53,33 @@ Run the generator script with your character JSON file:
 python generate_character_sheet.py fvtt_export/your-character-file.json
 ```
 
-The generated character sheet will be saved to `character_sheets/` as a Markdown file.
+The generated character sheet will be saved to `character_sheets/`.
+
+#### Output Formats
+
+Use the `--format` option to select output format:
+
+```bash
+# Markdown (default)
+python generate_character_sheet.py fvtt_export/character.json
+
+# HTML (B&W print optimized, skill descriptions in appendix)
+python generate_character_sheet.py fvtt_export/character.json --format html
+```
+
+| Format | Output | Best For |
+|--------|--------|----------|
+| `markdown` | `.md` file | Text editors, version control |
+| `html` | `.html` file | Browser viewing, printing to PDF |
 
 **Example:**
 ```bash
-python generate_character_sheet.py "fvtt_export/fvtt-Actor-character-name-ABC123XYZ.json"
+python generate_character_sheet.py "fvtt_export/fvtt-Actor-character-name-ABC123XYZ.json" --format html
 ```
 
-Output: `character_sheets/character_name.md`
+Output: `character_sheets/character_name.html`
+
+**Printing to PDF:** Open the HTML file in your browser and use "Print to PDF" (Ctrl+P / Cmd+P). The HTML is optimized for A4 black & white printing.
 
 ### Validating Character Data
 
@@ -363,10 +393,11 @@ The generated Markdown character sheet includes:
 - **Data** - Character biography and background information
 
 ### Format Details
-- **Output Format**: Markdown (.md)
+- **Output Formats**: Markdown (.md), HTML (.html)
 - **Tables**: Skills, S.P.E.C.I.A.L., Body Status
 - **Sections**: 14 organized sections for easy reference
 - **Descriptions**: All item and ability descriptions included in full
+- **HTML Features**: B&W print optimized, skill descriptions in separate appendix
 
 ## Calculated Statistics
 
@@ -395,10 +426,12 @@ The tool supports both character types from the FVTT Fallout system:
 ```
 fallout_char_mngt/
 ├── fvtt_export/                    # Place your exported JSON files here
-├── character_sheets/               # Generated character sheets (Markdown)
+├── character_sheets/               # Generated character sheets (MD/HTML)
 ├── reference_data/                 # Calculation formulas and attribution
+├── templates/                      # HTML templates for character sheets
 ├── generate_character_sheet.py    # Character sheet generator
 ├── validate_character.py           # Character data validation tool
+├── requirements.txt                # Optional dependencies (jinja2)
 ├── CLAUDE.md                       # Development guidance
 └── README.md                       # This file
 ```
@@ -441,9 +474,14 @@ See [`reference_data/SOURCE.md`](./reference_data/SOURCE.md) for complete attrib
 - Derived statistics calculation
 - Data validation and quality checks
 
+**Phase 2.1: HTML Output** ✅ COMPLETED
+- HTML output with B&W print optimized styling
+- Skill descriptions in separate appendix
+- Browser "Print to PDF" workflow
+
 **Phase 3: Enhancement** (Future)
-- PDF output via alternative approach
 - Layout optimization
+- Additional styling options
 
 ## Development
 
