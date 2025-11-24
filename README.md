@@ -46,17 +46,29 @@ Generate comprehensive printable character sheets from FoundryVTT JSON exports f
    cd /mnt/c/Users/YourName/path/to/fallout_char_mngt
    ```
 
-3. **Install Python and dependencies in WSL**:
+3. **Install Python venv package**:
    ```bash
    sudo apt update
-   sudo apt install python3 python3-pip
-   pip3 install -r requirements.txt
+   sudo apt install python3.12-venv
    ```
 
-4. **Generate PDF** from within WSL:
+4. **Create virtual environment in Linux filesystem** (required - venv on Windows mounts doesn't work correctly):
    ```bash
-   python3 generate_character_sheet.py fvtt_export/character.json --format pdf
+   python3 -m venv ~/fallout_venv
+   source ~/fallout_venv/bin/activate
+   pip install -r requirements.txt
    ```
+
+5. **Generate PDF** from within WSL (with venv activated):
+   ```bash
+   python generate_character_sheet.py fvtt_export/character.json --format pdf
+   ```
+
+**For future sessions**, activate the venv before running:
+```bash
+cd /mnt/c/Users/YourName/path/to/fallout_char_mngt
+source ~/fallout_venv/bin/activate
+```
 
 **Alternative for Windows without WSL:** Use `--format html` and print to PDF from your browser. Note that browser printing does not support page headers, footers, or automatic page numbers.
 
