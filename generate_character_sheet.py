@@ -714,14 +714,24 @@ class CharacterSheetGenerator:
             injuries_treated = part.get('injuryTreatedCount', 0)
             injuries = f"{injuries_open} open, {injuries_treated} treated" if (injuries_open + injuries_treated) > 0 else ""
 
+            # Calculate total resistances
+            phys = part_res.get('physical', 0) + global_res.get('physical', 0) + eq['physical']
+            energy = part_res.get('energy', 0) + global_res.get('energy', 0) + eq['energy']
+            rad = part_res.get('radiation', 0) + global_res.get('radiation', 0) + eq['radiation']
+            poison = part_res.get('poison', 0) + global_res.get('poison', 0) + eq['poison']
+
+            # Convert 999+ to infinity symbol (immune)
+            def fmt_res(val: int) -> str:
+                return '∞' if val >= 999 else str(val)
+
             result.append({
                 'name': part_names.get(part_key, part_key),
                 'status': part.get('status', 'healthy').capitalize(),
                 'injuries': injuries,
-                'physical': part_res.get('physical', 0) + global_res.get('physical', 0) + eq['physical'],
-                'energy': part_res.get('energy', 0) + global_res.get('energy', 0) + eq['energy'],
-                'radiation': part_res.get('radiation', 0) + global_res.get('radiation', 0) + eq['radiation'],
-                'poison': part_res.get('poison', 0) + global_res.get('poison', 0) + eq['poison'],
+                'physical': fmt_res(phys),
+                'energy': fmt_res(energy),
+                'radiation': fmt_res(rad),
+                'poison': fmt_res(poison),
             })
 
         return result
