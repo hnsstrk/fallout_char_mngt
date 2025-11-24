@@ -484,9 +484,15 @@ class CharacterSheetGenerator:
         global_r = global_resistance.get('radiation', 0)
         global_po = global_resistance.get('poison', 0)
 
-        # Calculate resistances from equipped apparel for each body part
+        # Get immunities (robots have poison/radiation immunity)
+        immunities = system.get('immunities', {})
+        immune_poison = immunities.get('poison', False)
+        immune_radiation = immunities.get('radiation', False)
+
+        # Calculate resistances from equipped apparel/robot_armor for each body part
         items = self.character_data.get('items', [])
-        apparel_items = [item for item in items if item.get('type') == 'apparel']
+        # Include both apparel (humanoids) and robot_armor (robots)
+        apparel_items = [item for item in items if item.get('type') in ['apparel', 'robot_armor']]
 
         # Initialize equipment resistance tracking per body part
         equipment_resistance = {
@@ -546,6 +552,12 @@ class CharacterSheetGenerator:
             res_e = part_resistance.get('energy', 0) + global_e + equip_res['energy']
             res_r = part_resistance.get('radiation', 0) + global_r + equip_res['radiation']
             res_po = part_resistance.get('poison', 0) + global_po + equip_res['poison']
+
+            # Apply immunities (robots are immune to poison/radiation)
+            if immune_radiation:
+                res_r = 999
+            if immune_poison:
+                res_po = 999
 
             # Convert 999+ to infinity symbol (immune)
             def fmt_res(val: int) -> str:
