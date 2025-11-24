@@ -39,9 +39,10 @@ class CharacterSheetGenerator:
     - html: Styled HTML with CSS (requires jinja2)
     """
 
-    def __init__(self, character_file: Path, output_format: str = 'markdown'):
+    def __init__(self, character_file: Path, output_format: str = 'markdown', include_appendix: bool = False):
         self.character_file = character_file
         self.output_format = output_format
+        self.include_appendix = include_appendix
         self.character_data = None
         self.character_name = None
         self.character_type = None
@@ -894,6 +895,7 @@ class CharacterSheetGenerator:
             'gear': self._extract_gear(items),
             'biography': self.strip_html(system.get('biography', '')),
             'generated_date': datetime.now().strftime('%Y-%m-%d %H:%M'),
+            'include_appendix': self.include_appendix,
         }
 
     def generate_html(self) -> str:
@@ -956,6 +958,8 @@ Examples:
     parser.add_argument('character_file', type=Path, help='Path to FVTT character JSON file')
     parser.add_argument('--format', '-f', choices=['markdown', 'html'], default='markdown',
                         help='Output format (default: markdown)')
+    parser.add_argument('--appendix', action='store_true',
+                        help='Include appendix with skill descriptions (HTML only)')
 
     args = parser.parse_args()
 
@@ -968,7 +972,7 @@ Examples:
         print("Error: HTML output requires jinja2. Install with: pip install jinja2")
         sys.exit(1)
 
-    generator = CharacterSheetGenerator(args.character_file, args.format)
+    generator = CharacterSheetGenerator(args.character_file, args.format, include_appendix=args.appendix)
     generator.run()
 
 

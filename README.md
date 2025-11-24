@@ -63,9 +63,19 @@ Use the `--format` option to select output format:
 # Markdown (default)
 python generate_character_sheet.py fvtt_export/character.json
 
-# HTML (B&W print optimized, skill descriptions in appendix)
+# HTML (B&W print optimized)
 python generate_character_sheet.py fvtt_export/character.json --format html
+
+# HTML with skill descriptions appendix
+python generate_character_sheet.py fvtt_export/character.json --format html --appendix
 ```
+
+#### Options
+
+| Option | Description |
+|--------|-------------|
+| `--format`, `-f` | Output format: `markdown` (default) or `html` |
+| `--appendix` | Include appendix with full skill descriptions (HTML only) |
 
 | Format | Output | Best For |
 |--------|--------|----------|
@@ -397,7 +407,7 @@ The generated Markdown character sheet includes:
 - **Tables**: Skills, S.P.E.C.I.A.L., Body Status
 - **Sections**: 14 organized sections for easy reference
 - **Descriptions**: All item and ability descriptions included in full
-- **HTML Features**: B&W print optimized, skill descriptions in separate appendix
+- **HTML Features**: B&W print optimized, optional skill descriptions appendix (`--appendix`)
 
 ## Calculated Statistics
 
@@ -476,7 +486,7 @@ See [`reference_data/SOURCE.md`](./reference_data/SOURCE.md) for complete attrib
 
 **Phase 2.1: HTML Output** ✅ COMPLETED
 - HTML output with B&W print optimized styling
-- Skill descriptions in separate appendix
+- Optional skill descriptions appendix (`--appendix` flag)
 - Browser "Print to PDF" workflow
 
 **Phase 3: Enhancement** (Future)

@@ -589,6 +589,7 @@
     </div>
 
     <!-- APPENDIX: SKILL DESCRIPTIONS -->
+    {% if include_appendix %}
     <div class="page appendix">
         <h2>Appendix: Skill Descriptions</h2>
         {% for skill in skills %}
@@ -601,6 +602,7 @@
         {% endif %}
         {% endfor %}
     </div>
+    {% endif %}
 
 </body>
 </html>
