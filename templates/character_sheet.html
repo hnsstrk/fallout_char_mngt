@@ -518,9 +518,9 @@
             {% endif %}
         </div>
 
-        <!-- APPAREL / ROBOT ARMOR -->
+        <!-- ROBOT ARMOR (only for robots) -->
+        {% if is_robot %}
         <div class="section">
-            {% if is_robot %}
             <h2>Robot Armor</h2>
             {% if robot_armor %}
                 <table>
@@ -544,7 +544,11 @@
             {% else %}
                 <p class="empty">None</p>
             {% endif %}
-            {% else %}
+        </div>
+        {% endif %}
+
+        <!-- APPAREL (for all character types) -->
+        <div class="section">
             <h2>Apparel</h2>
             {% if apparel %}
                 <table>
@@ -563,7 +567,6 @@
                 </table>
             {% else %}
                 <p class="empty">None</p>
-            {% endif %}
             {% endif %}
         </div>
 

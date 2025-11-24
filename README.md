@@ -395,8 +395,8 @@ The generated Markdown character sheet includes:
 ### Equipment & Inventory
 - **Weapons** - All weapons with stats (damage, range, fire rate, qualities) and full descriptions
   - **Ammunition** - Ammunition inventory with quantities and descriptions
-- **Apparel** - Armor and clothing with covered locations, resistances, and descriptions (humanoid characters)
 - **Robot Armor** - Armor plating with resistance values (robot characters only)
+- **Apparel** - Armor and clothing with covered locations, resistances, and descriptions
 - **Robot Modules** - Installed modules with effects (robot characters only)
 - **Consumables** - Food, chems, and other consumables with full descriptions and quantities
 - **Gear & Miscellany** - Books, misc items, and other equipment with descriptions
@@ -433,7 +433,7 @@ The tool supports both character types from the FVTT Fallout system:
 - **character** - Standard humanoid characters (humans, super mutants, ghouls)
   - Uses Apparel for armor/clothing
 - **robot** - Robots and mechanical units (e.g., Mister Gutsy, Protectron)
-  - Uses Robot Armor instead of Apparel
+  - Has Robot Armor section (in addition to Apparel)
   - Has Robot Modules section
   - May have built-in immunities (shown as ∞)
 
