@@ -7,11 +7,10 @@
     <style>
         /* ===== BASE STYLES ===== */
         :root {
-            --color-bg: #f5f5dc;
-            --color-bg-dark: #e8e4c9;
+            --color-bg: #f0f0f0;
+            --color-bg-dark: #e0e0e0;
             --color-border: #333;
             --color-text: #1a1a1a;
-            --color-accent: #4a7c59;
             --color-header: #2d2d2d;
             --font-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             --font-mono: 'Consolas', 'Courier New', monospace;
@@ -182,14 +181,12 @@
             padding: 3px 5px;
             text-align: center;
             font-size: 8pt;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
         }
 
         .condition-box.active {
-            background: var(--color-accent);
-            color: white;
+            border: 2px solid #000;
+            font-weight: bold;
+            background: var(--color-bg-dark);
         }
 
         /* ===== BODY STATUS ===== */
@@ -201,21 +198,39 @@
 
         .body-part {
             border: 1px solid var(--color-border);
-            padding: 5px;
-            font-size: 9pt;
+            padding: 4px;
+            font-size: 8pt;
         }
 
         .body-part .part-name {
             font-weight: bold;
             display: block;
+            margin-bottom: 3px;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 2px;
         }
 
         .body-part .resistances {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 2px;
             font-family: var(--font-mono);
             font-size: 7pt;
+            text-align: center;
+        }
+
+        .body-part .res-item {
+            background: var(--color-bg);
+            padding: 1px;
+        }
+
+        .body-part .res-label {
+            font-size: 6pt;
             color: #666;
-            display: block;
-            margin-top: 2px;
+        }
+
+        .body-part .res-value {
+            font-weight: bold;
         }
 
         /* ===== SKILLS TABLE ===== */
@@ -553,9 +568,13 @@
                 <div class="body-grid">
                     {% for part in body_parts %}
                     <div class="body-part">
-                        <span class="part-name">{{ part.name }}</span>
-                        <span class="resistances">E{{ part.energy }}/P{{ part.physical }}/Po{{ part.poison }}/R{{ part.radiation }}</span>
-                        {% if part.injuries %}<br><small>{{ part.injuries }}</small>{% endif %}
+                        <span class="part-name">{{ part.name }}{% if part.injuries %} - {{ part.injuries }}{% endif %}</span>
+                        <div class="resistances">
+                            <div class="res-item"><span class="res-label">E</span><br><span class="res-value">{{ part.energy }}</span></div>
+                            <div class="res-item"><span class="res-label">P</span><br><span class="res-value">{{ part.physical }}</span></div>
+                            <div class="res-item"><span class="res-label">Po</span><br><span class="res-value">{{ part.poison }}</span></div>
+                            <div class="res-item"><span class="res-label">R</span><br><span class="res-value">{{ part.radiation }}</span></div>
+                        </div>
                     </div>
                     {% endfor %}
                 </div>
