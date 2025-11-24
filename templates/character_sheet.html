@@ -20,9 +20,10 @@
         }
 
         .page {
-            max-width: 190mm;
+            max-width: 180mm;
             margin: 0 auto;
             padding: 5mm;
+            overflow: hidden;
         }
 
         /* ===== HEADER ===== */
@@ -254,13 +255,21 @@
 
         /* ===== PRINT STYLES ===== */
         @media print {
-            body {
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+
+            html, body {
+                width: 210mm;
                 font-size: 9pt;
             }
 
             .page {
-                max-width: none;
+                max-width: 186mm;
+                width: 186mm;
                 padding: 0;
+                margin: 0 auto;
             }
 
             .section {
@@ -269,8 +278,8 @@
         }
 
         @page {
-            size: A4;
-            margin: 10mm;
+            size: A4 portrait;
+            margin: 12mm;
         }
 
         /* ===== UTILITY ===== */
@@ -509,8 +518,33 @@
             {% endif %}
         </div>
 
-        <!-- APPAREL -->
+        <!-- APPAREL / ROBOT ARMOR -->
         <div class="section">
+            {% if is_robot %}
+            <h2>Robot Armor</h2>
+            {% if robot_armor %}
+                <table>
+                    <tr>
+                        <th>Item</th>
+                        <th class="center">E</th>
+                        <th class="center">P</th>
+                        <th class="center">Po</th>
+                        <th class="center">R</th>
+                    </tr>
+                    {% for item in robot_armor %}
+                    <tr>
+                        <td class="item-name">{{ item.name }}{% if item.equipped %} ✓{% endif %}</td>
+                        <td class="center">{{ item.energy }}</td>
+                        <td class="center">{{ item.physical }}</td>
+                        <td class="center">{{ item.poison }}</td>
+                        <td class="center">{{ item.radiation }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            {% else %}
+                <p class="empty">None</p>
+            {% endif %}
+            {% else %}
             <h2>Apparel</h2>
             {% if apparel %}
                 <table>
@@ -530,7 +564,27 @@
             {% else %}
                 <p class="empty">None</p>
             {% endif %}
+            {% endif %}
         </div>
+
+        <!-- ROBOT MODULES (only for robots) -->
+        {% if is_robot and robot_mods %}
+        <div class="section">
+            <h2>Robot Modules</h2>
+            <table>
+                <tr>
+                    <th>Module</th>
+                    <th>Effect</th>
+                </tr>
+                {% for mod in robot_mods %}
+                <tr>
+                    <td class="item-name">{{ mod.name }}{% if mod.equipped %} ✓{% endif %}</td>
+                    <td>{{ mod.effect or mod.description or '-' }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+        {% endif %}
 
         <!-- CONSUMABLES -->
         <div class="section">

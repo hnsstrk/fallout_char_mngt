@@ -122,8 +122,20 @@ class CharacterSheetGenerator:
         melee_damage += melee_damage_bonus
 
         # Calculate Carry Weight
+        # Robots have fixed 150 lbs, not increased by STR
         carry_weight_base = 150
-        carry_weight_total = carry_weight_base + (STR * 10) + carry_weight_mod
+        if self.character_type == 'robot':
+            # Add carry modifiers from robot_armor and robot_mods
+            items = self.character_data.get('items', [])
+            armor_carry_mod = 0
+            for item in items:
+                if item.get('type') in ['robot_armor', 'robot_mod']:
+                    item_sys = item.get('system', {})
+                    if item_sys.get('equipped', False):
+                        armor_carry_mod += item_sys.get('carry', 0)
+            carry_weight_total = carry_weight_base + carry_weight_mod + armor_carry_mod
+        else:
+            carry_weight_total = carry_weight_base + (STR * 10) + carry_weight_mod
 
         # Calculate Next Level XP
         next_level = level + 1
@@ -361,8 +373,13 @@ class CharacterSheetGenerator:
         return md
 
     def generate_apparel(self) -> str:
-        """Generate apparel section."""
+        """Generate apparel section (or robot armor for robots)."""
         items = self.character_data.get('items', [])
+
+        # For robots, show robot_armor instead of apparel
+        if self.character_type == 'robot':
+            return self.generate_robot_armor()
+
         apparel_items = [item for item in items if item.get('type') == 'apparel']
 
         if not apparel_items:
@@ -398,6 +415,79 @@ class CharacterSheetGenerator:
 
             if res_parts:
                 md += f"**Resistances**: {', '.join(res_parts)}\n\n"
+
+            if description:
+                md += f"{self.format_description(description)}\n\n"
+
+        return md
+
+    def generate_robot_armor(self) -> str:
+        """Generate robot armor section."""
+        items = self.character_data.get('items', [])
+        armor_items = [item for item in items if item.get('type') == 'robot_armor']
+
+        if not armor_items:
+            return ""
+
+        md = "## Robot Armor\n\n"
+
+        for item in sorted(armor_items, key=lambda a: a.get('name', '')):
+            name = item.get('name', 'Unknown')
+            system = item.get('system', {})
+            equipped = system.get('equipped', False)
+
+            description = system.get('description', '')
+            resistance = system.get('resistance', {})
+
+            md += f"### {name}"
+            if equipped:
+                md += " ✓"
+            md += "\n\n"
+
+            # Show resistances
+            res_parts = []
+            if resistance.get('energy', 0):
+                res_parts.append(f"Energy +{resistance['energy']}")
+            if resistance.get('physical', 0):
+                res_parts.append(f"Physical +{resistance['physical']}")
+            if resistance.get('poison', 0):
+                res_parts.append(f"Poison +{resistance['poison']}")
+            if resistance.get('radiation', 0):
+                res_parts.append(f"Radiation +{resistance['radiation']}")
+
+            if res_parts:
+                md += f"**Resistances**: {', '.join(res_parts)}\n\n"
+
+            if description:
+                md += f"{self.format_description(description)}\n\n"
+
+        return md
+
+    def generate_robot_mods(self) -> str:
+        """Generate robot modules section."""
+        items = self.character_data.get('items', [])
+        mod_items = [item for item in items if item.get('type') == 'robot_mod']
+
+        if not mod_items:
+            return ""
+
+        md = "## Robot Modules\n\n"
+
+        for item in sorted(mod_items, key=lambda m: m.get('name', '')):
+            name = item.get('name', 'Unknown')
+            system = item.get('system', {})
+            equipped = system.get('equipped', False)
+
+            description = system.get('description', '')
+            effect = system.get('effect', '')
+
+            md += f"### {name}"
+            if equipped:
+                md += " ✓"
+            md += "\n\n"
+
+            if effect:
+                md += f"**Effect**: {self.strip_html(effect)}\n\n"
 
             if description:
                 md += f"{self.format_description(description)}\n\n"
@@ -635,7 +725,9 @@ class CharacterSheetGenerator:
         md += self.generate_addictions()  # Before weapons
         md += self.generate_diseases()  # Before weapons
         md += self.generate_weapons()  # Now includes ammunition
-        md += self.generate_apparel()
+        md += self.generate_apparel()  # For robots, shows robot_armor
+        if self.character_type == 'robot':
+            md += self.generate_robot_mods()
         md += self.generate_consumables()
         md += self.generate_gear()
         md += self.generate_data()
@@ -667,15 +759,18 @@ class CharacterSheetGenerator:
         body_parts_data = system.get('body_parts', {})
         global_res = system.get('resistance', {})
 
-        # Check for robot armor (provides immunities)
-        robot_armor = system.get('robotArmor', {})
+        # Get immunities (robots have poison/radiation immunity)
+        immunities = system.get('immunities', {})
+        immune_poison = immunities.get('poison', False)
+        immune_radiation = immunities.get('radiation', False)
 
         # Calculate equipment resistances per body part
+        # Include both apparel (humanoids) and robot_armor (robots)
         equip_res = {part: {'physical': 0, 'energy': 0, 'radiation': 0, 'poison': 0}
                      for part in ['head', 'torso', 'armL', 'armR', 'legL', 'legR']}
 
         for item in items:
-            if item.get('type') != 'apparel':
+            if item.get('type') not in ['apparel', 'robot_armor']:
                 continue
             item_sys = item.get('system', {})
             if not item_sys.get('equipped', False):
@@ -708,12 +803,11 @@ class CharacterSheetGenerator:
             rad = part_res.get('radiation', 0) + global_res.get('radiation', 0) + eq['radiation']
             poison = part_res.get('poison', 0) + global_res.get('poison', 0) + eq['poison']
 
-            # Add robot armor immunities if present
-            if robot_armor:
-                phys += robot_armor.get('physical', 0)
-                energy += robot_armor.get('energy', 0)
-                rad += robot_armor.get('radiation', 0)
-                poison += robot_armor.get('poison', 0)
+            # Apply immunities (robots are immune to poison/radiation)
+            if immune_radiation:
+                rad = 999
+            if immune_poison:
+                poison = 999
 
             # Convert 999+ to infinity symbol (immune)
             def fmt_res(val: int) -> str:
@@ -859,6 +953,41 @@ class CharacterSheetGenerator:
             })
         return result
 
+    def _extract_robot_mods(self, items: List) -> List[Dict]:
+        """Extract robot modules for template."""
+        mods = [item for item in items if item.get('type') == 'robot_mod']
+        result = []
+        for mod in sorted(mods, key=lambda m: m.get('name', '')):
+            sys = mod.get('system', {})
+            desc = sys.get('description', '')
+            effect = sys.get('effect', '')
+            result.append({
+                'name': mod.get('name', 'Unknown'),
+                'description': self.strip_html(desc) if desc else '',
+                'effect': self.strip_html(effect) if effect else '',
+                'equipped': sys.get('equipped', False),
+            })
+        return result
+
+    def _extract_robot_armor(self, items: List) -> List[Dict]:
+        """Extract robot armor for template."""
+        armor = [item for item in items if item.get('type') == 'robot_armor']
+        result = []
+        for item in armor:
+            sys = item.get('system', {})
+            res = sys.get('resistance', {})
+            desc = sys.get('description', '')
+            result.append({
+                'name': item.get('name', 'Unknown'),
+                'description': self.strip_html(desc) if desc else '',
+                'physical': res.get('physical', 0),
+                'energy': res.get('energy', 0),
+                'radiation': res.get('radiation', 0),
+                'poison': res.get('poison', 0),
+                'equipped': sys.get('equipped', False),
+            })
+        return result
+
     def _prepare_template_context(self) -> Dict:
         """Prepare context dictionary for HTML template."""
         system = self.character_data.get('system', {})
@@ -893,6 +1022,9 @@ class CharacterSheetGenerator:
             'apparel': self._extract_apparel(items),
             'consumables': self._extract_consumables(items),
             'gear': self._extract_gear(items),
+            'robot_mods': self._extract_robot_mods(items),
+            'robot_armor': self._extract_robot_armor(items),
+            'is_robot': self.character_type == 'robot',
             'biography': self.strip_html(system.get('biography', '')),
             'generated_date': datetime.now().strftime('%Y-%m-%d %H:%M'),
             'include_appendix': self.include_appendix,
