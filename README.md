@@ -14,6 +14,13 @@ Generate comprehensive printable character sheets from FoundryVTT JSON exports f
 - FoundryVTT character export (JSON format)
 - Fallout 2d20 system (tested with v11.14.3 - v11.16.4)
 
+### Optional Dependencies
+
+| Output Format | Required Packages |
+|---------------|-------------------|
+| Markdown | None (Python standard library) |
+| HTML | `jinja2` |
+
 ## Installation
 
 1. Clone this repository:
@@ -22,7 +29,12 @@ git clone https://github.com/hnsstrk/fallout_char_mngt.git
 cd fallout_char_mngt
 ```
 
-2. No additional dependencies required - uses Python standard library only.
+2. **For Markdown output**: No additional installation required.
+
+3. **For HTML output**: Install optional dependencies:
+```bash
+pip install -r requirements.txt
+```
 
 ## Usage
 
@@ -41,14 +53,43 @@ Run the generator script with your character JSON file:
 python generate_character_sheet.py fvtt_export/your-character-file.json
 ```
 
-The generated character sheet will be saved to `character_sheets/` as a Markdown file.
+The generated character sheet will be saved to `character_sheets/`.
+
+#### Output Formats
+
+Use the `--format` option to select output format:
+
+```bash
+# Markdown (default)
+python generate_character_sheet.py fvtt_export/character.json
+
+# HTML (B&W print optimized)
+python generate_character_sheet.py fvtt_export/character.json --format html
+
+# HTML with skill descriptions appendix
+python generate_character_sheet.py fvtt_export/character.json --format html --appendix
+```
+
+#### Options
+
+| Option | Description |
+|--------|-------------|
+| `--format`, `-f` | Output format: `markdown` (default) or `html` |
+| `--appendix` | Include appendix with full skill descriptions (HTML only) |
+
+| Format | Output | Best For |
+|--------|--------|----------|
+| `markdown` | `.md` file | Text editors, version control |
+| `html` | `.html` file | Browser viewing, printing to PDF |
 
 **Example:**
 ```bash
-python generate_character_sheet.py "fvtt_export/fvtt-Actor-character-name-ABC123XYZ.json"
+python generate_character_sheet.py "fvtt_export/fvtt-Actor-character-name-ABC123XYZ.json" --format html
 ```
 
-Output: `character_sheets/character_name.md`
+Output: `character_sheets/character_name.html`
+
+**Printing to PDF:** Open the HTML file in your browser and use "Print to PDF" (Ctrl+P / Cmd+P). The HTML is optimized for A4 black & white printing.
 
 ### Validating Character Data
 
@@ -354,7 +395,9 @@ The generated Markdown character sheet includes:
 ### Equipment & Inventory
 - **Weapons** - All weapons with stats (damage, range, fire rate, qualities) and full descriptions
   - **Ammunition** - Ammunition inventory with quantities and descriptions
+- **Robot Armor** - Armor plating with resistance values (robot characters only)
 - **Apparel** - Armor and clothing with covered locations, resistances, and descriptions
+- **Robot Modules** - Installed modules with effects (robot characters only)
 - **Consumables** - Food, chems, and other consumables with full descriptions and quantities
 - **Gear & Miscellany** - Books, misc items, and other equipment with descriptions
 
@@ -362,11 +405,11 @@ The generated Markdown character sheet includes:
 - **Data** - Character biography and background information
 
 ### Format Details
-- **Output Format**: Markdown (.md)
+- **Output Formats**: Markdown (.md), HTML (.html)
 - **Tables**: Skills, S.P.E.C.I.A.L., Body Status
 - **Sections**: 14 organized sections for easy reference
 - **Descriptions**: All item and ability descriptions included in full
-- **Ready for**: Direct printing, PDF conversion, or viewing in any Markdown viewer
+- **HTML Features**: B&W print optimized, optional skill descriptions appendix (`--appendix`)
 
 ## Calculated Statistics
 
@@ -388,17 +431,23 @@ See [`reference_data/formulas.json`](./reference_data/formulas.json) for complet
 The tool supports both character types from the FVTT Fallout system:
 
 - **character** - Standard humanoid characters (humans, super mutants, ghouls)
-- **robot** - Robots and mechanical units (different attribute structure)
+  - Uses Apparel for armor/clothing
+- **robot** - Robots and mechanical units (e.g., Mister Gutsy, Protectron)
+  - Has Robot Armor section (in addition to Apparel)
+  - Has Robot Modules section
+  - May have built-in immunities (shown as ∞)
 
 ## Repository Structure
 
 ```
 fallout_char_mngt/
 ├── fvtt_export/                    # Place your exported JSON files here
-├── character_sheets/               # Generated character sheets (Markdown)
+├── character_sheets/               # Generated character sheets (MD/HTML)
 ├── reference_data/                 # Calculation formulas and attribution
+├── templates/                      # HTML templates for character sheets
 ├── generate_character_sheet.py    # Character sheet generator
 ├── validate_character.py           # Character data validation tool
+├── requirements.txt                # Optional dependencies (jinja2)
 ├── CLAUDE.md                       # Development guidance
 └── README.md                       # This file
 ```
@@ -441,10 +490,14 @@ See [`reference_data/SOURCE.md`](./reference_data/SOURCE.md) for complete attrib
 - Derived statistics calculation
 - Data validation and quality checks
 
+**Phase 2.1: HTML Output** ✅ COMPLETED
+- HTML output with B&W print optimized styling
+- Optional skill descriptions appendix (`--appendix` flag)
+- Browser "Print to PDF" workflow
+
 **Phase 3: Enhancement** (Future)
-- PDF generation
-- HTML output option
-- Batch processing for multiple characters
+- Layout optimization
+- Additional styling options
 
 ## Development
 
