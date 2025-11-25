@@ -5,292 +5,55 @@
     <title>{{ character.name }} - Character Sheet</title>
     <style>
         /* ===== B&W PRINT OPTIMIZED STYLES ===== */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            font-size: 9pt;
-            line-height: 1.3;
-            color: #000;
-            background: #fff;
-        }
-
-        .page {
-            max-width: 180mm;
-            margin: 0 auto;
-            padding: 5mm;
-            overflow: hidden;
-        }
-
-        /* ===== HEADER ===== */
-        .header {
-            border-bottom: 2px solid #000;
-            padding-bottom: 5px;
-            margin-bottom: 10px;
-        }
-
-        .header h1 {
-            font-size: 18pt;
-            margin: 0;
-        }
-
-        .header-info {
-            font-size: 10pt;
-            margin-top: 3px;
-        }
-
-        .header-info span {
-            margin-right: 20px;
-        }
-
-        /* ===== SECTIONS ===== */
-        .section {
-            margin-bottom: 10px;
-            page-break-inside: avoid;
-        }
-
-        .section h2 {
-            font-size: 11pt;
-            background: #000;
-            color: #fff;
-            padding: 3px 8px;
-            margin-bottom: 5px;
-        }
-
-        .section h3 {
-            font-size: 10pt;
-            border-bottom: 1px solid #000;
-            margin: 8px 0 5px 0;
-            padding-bottom: 2px;
-        }
-
-        /* ===== TABLES ===== */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 9pt;
-        }
-
-        th, td {
-            border: 1px solid #000;
-            padding: 3px 5px;
-            text-align: left;
-        }
-
-        th {
-            background: #ddd;
-            font-weight: bold;
-        }
-
-        .center {
-            text-align: center;
-        }
-
-        /* ===== TWO COLUMN LAYOUT ===== */
-        .two-col {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .two-col > tbody > tr > td {
-            width: 50%;
-            vertical-align: top;
-            padding: 0;
-            border: none;
-        }
-
-        .two-col > tbody > tr > td:first-child {
-            padding-right: 5px;
-        }
-
-        .two-col > tbody > tr > td:last-child {
-            padding-left: 5px;
-        }
-
-        /* ===== SPECIAL ATTRIBUTES ===== */
-        .special-table td {
-            text-align: center;
-            font-weight: bold;
-        }
-
-        .special-table .attr-name {
-            font-size: 8pt;
-            font-weight: normal;
-            color: #666;
-        }
-
-        .special-table .attr-value {
-            font-size: 14pt;
-        }
-
-        /* ===== DERIVED STATS ===== */
-        .stats-table td {
-            text-align: center;
-        }
-
-        .stats-table .stat-name {
-            font-size: 8pt;
-            color: #666;
-        }
-
-        .stats-table .stat-value {
-            font-size: 11pt;
-            font-weight: bold;
-        }
-
-        /* ===== CONDITIONS ===== */
-        .conditions-table td {
-            text-align: center;
-            font-size: 8pt;
-        }
-
-        .conditions-table .active {
-            font-weight: bold;
-            background: #ddd;
-        }
-
-        /* ===== BODY STATUS ===== */
-        .body-table th {
-            width: 20%;
-        }
-
-        .body-table .res-header {
-            font-size: 7pt;
-        }
-
-        /* ===== SKILLS ===== */
-        .skills-table .tag {
-            text-align: center;
-            font-weight: bold;
-        }
-
-        .skills-table .rank {
-            text-align: center;
-            font-weight: bold;
-        }
-
-        .skills-table .attr {
-            text-align: center;
-            font-size: 8pt;
-            color: #666;
-        }
-
-        /* ===== ITEMS ===== */
-        .item-name {
-            font-weight: bold;
-        }
-
-        .item-desc {
-            font-size: 8pt;
-            color: #333;
-            margin-top: 2px;
-        }
-
-        .item-stats {
-            font-size: 8pt;
-            color: #666;
-        }
-
-        /* ===== PERKS/TRAITS ===== */
-        .perk-item {
-            margin-bottom: 8px;
-            padding-bottom: 5px;
-            border-bottom: 1px dashed #ccc;
-        }
-
-        .perk-item:last-child {
-            border-bottom: none;
-        }
-
-        .perk-name {
-            font-weight: bold;
-        }
-
-        .perk-desc {
-            font-size: 8pt;
-            margin-top: 2px;
-        }
-
-        /* ===== APPENDIX ===== */
-        .appendix {
-            page-break-before: always;
-        }
-
-        .appendix h2 {
-            font-size: 14pt;
-            background: #000;
-            color: #fff;
-            padding: 5px 10px;
-            margin-bottom: 10px;
-        }
-
-        .skill-detail {
-            margin-bottom: 10px;
-            padding-bottom: 8px;
-            border-bottom: 1px solid #ccc;
-        }
-
-        .skill-detail:last-child {
-            border-bottom: none;
-        }
-
-        .skill-detail-name {
-            font-weight: bold;
-            font-size: 10pt;
-        }
-
-        .skill-detail-info {
-            font-size: 8pt;
-            color: #666;
-            margin-bottom: 3px;
-        }
-
-        .skill-detail-desc {
-            font-size: 9pt;
-        }
-
-        /* ===== PRINT STYLES ===== */
-        @media print {
-            * {
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-            }
-
-            html, body {
-                width: 210mm;
-                font-size: 9pt;
-            }
-
-            .page {
-                max-width: 186mm;
-                width: 186mm;
-                padding: 0;
-                margin: 0 auto;
-            }
-
-            .section {
-                page-break-inside: avoid;
-            }
-        }
-
-        @page {
-            size: A4 portrait;
-            margin: 12mm;
-        }
-
-        /* ===== UTILITY ===== */
-        .empty {
-            color: #999;
-            font-style: italic;
-        }
-
-        .mono {
-            font-family: 'Consolas', 'Courier New', monospace;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 9pt; line-height: 1.3; color: #000; background: #fff; }
+        .page { max-width: 180mm; margin: 0 auto; padding: 5mm; overflow: hidden; }
+        .header { border-bottom: 2px solid #000; padding-bottom: 5px; margin-bottom: 10px; }
+        .header h1 { font-size: 18pt; margin: 0; }
+        .header-info { font-size: 10pt; margin-top: 3px; }
+        .header-info span { margin-right: 20px; }
+        .section { margin-bottom: 10px; page-break-inside: avoid; }
+        .section h2 { font-size: 11pt; background: #000; color: #fff; padding: 3px 8px; margin-bottom: 5px; }
+        .section h3 { font-size: 10pt; border-bottom: 1px solid #000; margin: 8px 0 5px 0; padding-bottom: 2px; }
+        table { width: 100%; border-collapse: collapse; font-size: 9pt; }
+        th, td { border: 1px solid #000; padding: 3px 5px; text-align: left; }
+        th { background: #ddd; font-weight: bold; }
+        .center { text-align: center; }
+        .two-col { width: 100%; border-collapse: collapse; }
+        .two-col > tbody > tr > td { width: 50%; vertical-align: top; padding: 0; border: none; }
+        .two-col > tbody > tr > td:first-child { padding-right: 5px; }
+        .two-col > tbody > tr > td:last-child { padding-left: 5px; }
+        .special-table td { text-align: center; font-weight: bold; }
+        .special-table .attr-name { font-size: 8pt; font-weight: normal; color: #666; }
+        .special-table .attr-value { font-size: 14pt; }
+        .stats-table td { text-align: center; }
+        .stats-table .stat-name { font-size: 8pt; color: #666; }
+        .stats-table .stat-value { font-size: 11pt; font-weight: bold; }
+        .conditions-table td { text-align: center; font-size: 8pt; }
+        .conditions-table .active { font-weight: bold; background: #ddd; }
+        .body-table th { width: 20%; }
+        .body-table .res-header { font-size: 7pt; }
+        .skills-table .tag, .skills-table .rank, .skills-table .attr { text-align: center; }
+        .skills-table .tag, .skills-table .rank { font-weight: bold; }
+        .skills-table .attr { font-size: 8pt; color: #666; }
+        .item-name { font-weight: bold; }
+        .item-desc { font-size: 8pt; color: #333; margin-top: 2px; }
+        .item-stats { font-size: 8pt; color: #666; }
+        .perk-item { margin-bottom: 8px; padding-bottom: 5px; border-bottom: 1px dashed #ccc; }
+        .perk-item:last-child { border-bottom: none; }
+        .perk-name { font-weight: bold; }
+        .perk-desc { font-size: 8pt; margin-top: 2px; }
+        .appendix { page-break-before: always; }
+        .appendix h2 { font-size: 14pt; background: #000; color: #fff; padding: 5px 10px; margin-bottom: 10px; }
+        .skill-detail { margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid #ccc; }
+        .skill-detail:last-child { border-bottom: none; }
+        .skill-detail-name { font-weight: bold; font-size: 10pt; }
+        .skill-detail-info { font-size: 8pt; color: #666; margin-bottom: 3px; }
+        .skill-detail-desc { font-size: 9pt; }
+        @media print { * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; } html, body { width: 210mm; font-size: 9pt; } .page { max-width: 186mm; width: 186mm; padding: 0; margin: 0 auto; } .section { page-break-inside: avoid; } }
+        @page { size: A4 portrait; margin: 12mm; }
+        .empty { color: #999; font-style: italic; }
+        .mono { font-family: 'Consolas', 'Courier New', monospace; }
     </style>
 </head>
 <body>
@@ -299,7 +62,7 @@
         <div class="header">
             <h1>{{ character.name }}</h1>
             <div class="header-info">
-                <span><strong>Origin:</strong> {{ character.origin or 'Unknown' }}</span>
+                <span><strong>Origin:</strong> {{ character.get_origin() or 'Unknown' }}</span>
                 <span><strong>Level:</strong> {{ character.level }}</span>
                 <span><strong>XP:</strong> {{ derived.current_xp }} / {{ derived.next_level_xp }}</span>
             </div>
@@ -313,13 +76,9 @@
                         <h2>S.P.E.C.I.A.L.</h2>
                         <table class="special-table">
                             <tr>
-                                <td><div class="attr-name">STR</div><div class="attr-value">{{ attributes.str }}</div></td>
-                                <td><div class="attr-name">PER</div><div class="attr-value">{{ attributes.per }}</div></td>
-                                <td><div class="attr-name">END</div><div class="attr-value">{{ attributes.end }}</div></td>
-                                <td><div class="attr-name">CHA</div><div class="attr-value">{{ attributes.cha }}</div></td>
-                                <td><div class="attr-name">INT</div><div class="attr-value">{{ attributes.int }}</div></td>
-                                <td><div class="attr-name">AGI</div><div class="attr-value">{{ attributes.agi }}</div></td>
-                                <td><div class="attr-name">LCK</div><div class="attr-value">{{ attributes.lck }}</div></td>
+                                {% for name, value in attributes.items() %}
+                                <td><div class="attr-name">{{ name[:3].upper() }}</div><div class="attr-value">{{ value }}</div></td>
+                                {% endfor %}
                             </tr>
                         </table>
                     </div>
@@ -351,16 +110,15 @@
                     <div class="section">
                         <h2>Conditions</h2>
                         <table class="conditions-table">
-                            <tr>
-                                <td>Hunger: {{ conditions.hunger }}</td>
-                                <td>Thirst: {{ conditions.thirst }}</td>
-                                <td>Sleep: {{ conditions.sleep }}</td>
-                                <td>Fatigue: {{ conditions.fatigue }}</td>
+                           <tr>
+                                {% for name, value in conditions.items() if value is not boolean %}
+                                <td>{{ name }}: {{ value }}</td>
+                                {% endfor %}
                             </tr>
                             <tr>
-                                <td>Intox: {{ conditions.intoxication }}</td>
-                                <td{% if conditions.alcoholic %} class="active"{% endif %}>Alcoholic: {{ 'Yes' if conditions.alcoholic else 'No' }}</td>
-                                <td{% if conditions.well_rested %} class="active"{% endif %} colspan="2">Well Rested: {{ 'Yes' if conditions.well_rested else 'No' }}</td>
+                                {% for name, value in conditions.items() if value is boolean %}
+                                <td{% if value %} class="active"{% endif %} colspan="2">{{ name }}: {{ 'Yes' if value else 'No' }}</td>
+                                {% endfor %}
                             </tr>
                         </table>
                     </div>
@@ -379,10 +137,10 @@
                             {% for part in body_parts %}
                             <tr>
                                 <td>{{ part.name }}</td>
-                                <td class="center mono">{{ part.energy }}</td>
-                                <td class="center mono">{{ part.physical }}</td>
-                                <td class="center mono">{{ part.poison }}</td>
-                                <td class="center mono">{{ part.radiation }}</td>
+                                <td class="center mono">{{ part.energy_res }}</td>
+                                <td class="center mono">{{ part.physical_res }}</td>
+                                <td class="center mono">{{ part.poison_res }}</td>
+                                <td class="center mono">{{ part.radiation_res }}</td>
                             </tr>
                             {% endfor %}
                         </table>
@@ -391,88 +149,21 @@
             </tr>
         </table>
 
-        <!-- SKILLS (without descriptions - those go to appendix) -->
+        <!-- SKILLS -->
         <div class="section">
             <h2>Skills</h2>
             <table class="skills-table">
-                <tr>
-                    <th>Skill</th>
-                    <th style="width:40px" class="center">Tag</th>
-                    <th style="width:40px" class="center">Rank</th>
-                    <th style="width:40px" class="center">Attr</th>
-                </tr>
+                <tr><th>Skill</th><th style="width:40px" class="center">Tag</th><th style="width:40px" class="center">Rank</th><th style="width:40px" class="center">Attr</th></tr>
                 {% for skill in skills %}
-                <tr>
-                    <td>{{ skill.name }}</td>
-                    <td class="tag">{{ '✓' if skill.tag else '' }}</td>
-                    <td class="rank">{{ skill.rank }}</td>
-                    <td class="attr">{{ skill.attribute }}</td>
-                </tr>
+                <tr><td>{{ skill.name }}</td><td class="tag">{{ skill.tag }}</td><td class="rank">{{ skill.rank }}</td><td class="attr">{{ skill.attribute }}</td></tr>
                 {% endfor %}
             </table>
         </div>
 
-        <!-- PERKS + TRAITS -->
+        <!-- PERKS + TRAIT -->
         <table class="two-col">
-            <tr>
-                <td>
-                    <div class="section">
-                        <h2>Perks</h2>
-                        {% if perks %}
-                            {% for perk in perks %}
-                            <div class="perk-item">
-                                <span class="perk-name">{{ perk.name }}</span>
-                                {% if perk.rank > 1 %}<span class="item-stats">(Rank {{ perk.rank }})</span>{% endif %}
-                                {% if perk.description %}<div class="perk-desc">{{ perk.description }}</div>{% endif %}
-                            </div>
-                            {% endfor %}
-                        {% else %}
-                            <p class="empty">None</p>
-                        {% endif %}
-                    </div>
-                </td>
-                <td>
-                    <div class="section">
-                        <h2>Traits</h2>
-                        {% if traits %}
-                            {% for trait in traits %}
-                            <div class="perk-item">
-                                <span class="perk-name">{{ trait.name }}</span>
-                                {% if trait.description %}<div class="perk-desc">{{ trait.description }}</div>{% endif %}
-                            </div>
-                            {% endfor %}
-                        {% else %}
-                            <p class="empty">None</p>
-                        {% endif %}
-                    </div>
-                </td>
-            </tr>
-        </table>
-
-        <!-- ADDICTIONS + DISEASES -->
-        <table class="two-col">
-            <tr>
-                <td>
-                    <div class="section">
-                        <h2>Addictions</h2>
-                        {% if addictions %}
-                            {% for item in addictions %}<div>{{ item.name }}</div>{% endfor %}
-                        {% else %}
-                            <p class="empty">None</p>
-                        {% endif %}
-                    </div>
-                </td>
-                <td>
-                    <div class="section">
-                        <h2>Diseases</h2>
-                        {% if diseases %}
-                            {% for item in diseases %}<div>{{ item.name }}</div>{% endfor %}
-                        {% else %}
-                            <p class="empty">None</p>
-                        {% endif %}
-                    </div>
-                </td>
-            </tr>
+            <tr><td><div class="section"><h2>Perks</h2>{% if perks %}{% for perk in perks %}<div class="perk-item"><span class="perk-name">{{ perk.name }}</span>{% if perk.rank > 1 %}<span class="item-stats">(Rank {{ perk.rank }})</span>{% endif %}{% if perk.description %}<div class="perk-desc">{{ perk.description }}</div>{% endif %}</div>{% endfor %}{% else %}<p class="empty">None</p>{% endif %}</div></td>
+                <td><div class="section"><h2>Trait</h2>{% if trait %}<div class="perk-item"><span class="perk-name">{{ trait.name }}</span>{% if trait.description %}<div class="perk-desc">{{ trait.description }}</div>{% endif %}</div>{% else %}<p class="empty">None</p>{% endif %}</div></td></tr>
         </table>
 
         <!-- WEAPONS -->
@@ -480,186 +171,31 @@
             <h2>Weapons</h2>
             {% if weapons %}
                 <table>
-                    <tr>
-                        <th>Weapon</th>
-                        <th class="center">Damage</th>
-                        <th class="center">Range</th>
-                        <th class="center">Rate</th>
-                        <th>Qualities</th>
-                    </tr>
-                    {% for weapon in weapons %}
-                    <tr>
-                        <td class="item-name">{{ weapon.name }}</td>
-                        <td class="center">{{ weapon.damage }} {{ weapon.damage_type }}</td>
-                        <td class="center">{{ weapon.range or '-' }}</td>
-                        <td class="center">{{ weapon.fire_rate or '-' }}</td>
-                        <td>{{ weapon.qualities or '-' }}</td>
-                    </tr>
-                    {% endfor %}
+                    <tr><th>Weapon</th><th class="center">Damage</th><th class="center">Range</th><th class="center">Rate</th><th>Qualities</th></tr>
+                    {% for w in weapons %}<tr><td class="item-name">{{ w.name }}</td><td class="center">{{ w.damage }} {{ w.damage_type }}</td><td class="center">{{ w.range or '-' }}</td><td class="center">{{ w.fire_rate or '-' }}</td><td>{{ w.qualities or '-' }}</td></tr>{% endfor %}
                 </table>
-            {% else %}
-                <p class="empty">None</p>
-            {% endif %}
-
-            {% if ammo %}
-            <h3>Ammunition</h3>
-            <table>
-                <tr>
-                    <th>Type</th>
-                    <th class="center" style="width:60px">Qty</th>
-                </tr>
-                {% for item in ammo %}
-                <tr>
-                    <td>{{ item.name }}</td>
-                    <td class="center mono">{{ item.quantity }}</td>
-                </tr>
-                {% endfor %}
-            </table>
-            {% endif %}
+            {% else %}<p class="empty">None</p>{% endif %}
+            {% if ammo %}<h3>Ammunition</h3><table><tr><th>Type</th><th class="center" style="width:60px">Qty</th></tr>{% for item in ammo %}<tr><td>{{ item.name }}</td><td class="center mono">{{ item.quantity }}</td></tr>{% endfor %}</table>{% endif %}
         </div>
 
-        <!-- ROBOT ARMOR (only for robots) -->
+        <!-- APPAREL -->
+        <div class="section"><h2>Apparel</h2>{% if apparel %}<table><tr><th>Item</th><th>Locations</th><th>Resistances</th></tr>{% for item in apparel %}<tr><td class="item-name">{{ item.name }}</td><td>{{ item.locations or '-' }}</td><td>{{ item.resistances or '-' }}</td></tr>{% endfor %}</table>{% else %}<p class="empty">None</p>{% endif %}</div>
+
+        <!-- ROBOT-SPECIFIC SECTIONS -->
         {% if is_robot %}
-        <div class="section">
-            <h2>Robot Armor</h2>
-            {% if robot_armor %}
-                <table>
-                    <tr>
-                        <th>Item</th>
-                        <th class="center">E</th>
-                        <th class="center">P</th>
-                        <th class="center">Po</th>
-                        <th class="center">R</th>
-                    </tr>
-                    {% for item in robot_armor %}
-                    <tr>
-                        <td class="item-name">{{ item.name }}{% if item.equipped %} ✓{% endif %}</td>
-                        <td class="center">{{ item.energy }}</td>
-                        <td class="center">{{ item.physical }}</td>
-                        <td class="center">{{ item.poison }}</td>
-                        <td class="center">{{ item.radiation }}</td>
-                    </tr>
-                    {% endfor %}
-                </table>
-            {% else %}
-                <p class="empty">None</p>
-            {% endif %}
-        </div>
+        <div class="section"><h2>Robot Armor</h2>{% if robot_armor %}<table><tr><th>Item</th><th class="center">E</th><th class="center">P</th><th class="center">Po</th><th class="center">R</th></tr>{% for item in robot_armor %}<tr><td class="item-name">{{ item.name }}{% if item.equipped %} ✓{% endif %}</td><td class="center">{{ item.resistance.energy or 0 }}</td><td class="center">{{ item.resistance.physical or 0 }}</td><td class="center">{{ item.resistance.poison or 0 }}</td><td class="center">{{ item.resistance.radiation or 0 }}</td></tr>{% endfor %}</table>{% else %}<p class="empty">None</p>{% endif %}</div>
+        <div class="section"><h2>Robot Modules</h2>{% if robot_mods %}<table><tr><th>Module</th><th>Effect</th></tr>{% for mod in robot_mods %}<tr><td class="item-name">{{ mod.name }}{% if mod.equipped %} ✓{% endif %}</td><td>{{ mod.effect or mod.description or '-' }}</td></tr>{% endfor %}</table>{% else %}<p class="empty">None</p>{% endif %}</div>
         {% endif %}
 
-        <!-- APPAREL (for all character types) -->
-        <div class="section">
-            <h2>Apparel</h2>
-            {% if apparel %}
-                <table>
-                    <tr>
-                        <th>Item</th>
-                        <th>Locations</th>
-                        <th>Resistances</th>
-                    </tr>
-                    {% for item in apparel %}
-                    <tr>
-                        <td class="item-name">{{ item.name }}</td>
-                        <td>{{ item.locations or '-' }}</td>
-                        <td>{{ item.resistances or '-' }}</td>
-                    </tr>
-                    {% endfor %}
-                </table>
-            {% else %}
-                <p class="empty">None</p>
-            {% endif %}
-        </div>
-
-        <!-- ROBOT MODULES (only for robots) -->
-        {% if is_robot and robot_mods %}
-        <div class="section">
-            <h2>Robot Modules</h2>
-            <table>
-                <tr>
-                    <th>Module</th>
-                    <th>Effect</th>
-                </tr>
-                {% for mod in robot_mods %}
-                <tr>
-                    <td class="item-name">{{ mod.name }}{% if mod.equipped %} ✓{% endif %}</td>
-                    <td>{{ mod.effect or mod.description or '-' }}</td>
-                </tr>
-                {% endfor %}
-            </table>
-        </div>
-        {% endif %}
-
-        <!-- CONSUMABLES -->
-        <div class="section">
-            <h2>Consumables</h2>
-            {% if consumables %}
-                <table>
-                    <tr>
-                        <th>Item</th>
-                        <th class="center" style="width:40px">Qty</th>
-                        <th>Effect</th>
-                    </tr>
-                    {% for item in consumables %}
-                    <tr>
-                        <td class="item-name">{{ item.name }}</td>
-                        <td class="center mono">{{ item.quantity }}</td>
-                        <td class="item-stats">{{ item.description[:80] ~ '...' if item.description and item.description|length > 80 else item.description or '-' }}</td>
-                    </tr>
-                    {% endfor %}
-                </table>
-            {% else %}
-                <p class="empty">None</p>
-            {% endif %}
-        </div>
-
-        <!-- GEAR -->
-        <div class="section">
-            <h2>Gear &amp; Miscellany</h2>
-            {% if gear %}
-                <table>
-                    <tr>
-                        <th>Item</th>
-                        <th class="center" style="width:40px">Qty</th>
-                        <th>Type</th>
-                    </tr>
-                    {% for item in gear %}
-                    <tr>
-                        <td class="item-name">{{ item.name }}</td>
-                        <td class="center mono">{{ item.quantity }}</td>
-                        <td class="item-stats">{{ item.type_label or '-' }}</td>
-                    </tr>
-                    {% endfor %}
-                </table>
-            {% else %}
-                <p class="empty">None</p>
-            {% endif %}
-        </div>
+        <!-- INVENTORY -->
+        <div class="section"><h2>Consumables</h2>{% if consumables %}<table><tr><th>Item</th><th class="center" style="width:40px">Qty</th><th>Effect</th></tr>{% for item in consumables %}<tr><td class="item-name">{{ item.name }}</td><td class="center mono">{{ item.quantity }}</td><td class="item-stats">{{ item.description[:80] ~ '...' if item.description and item.description|length > 80 else item.description or '-' }}</td></tr>{% endfor %}</table>{% else %}<p class="empty">None</p>{% endif %}</div>
+        <div class="section"><h2>Gear &amp; Miscellany</h2>{% if gear %}<table><tr><th>Item</th><th class="center" style="width:40px">Qty</th><th>Type</th></tr>{% for item in gear %}<tr><td class="item-name">{{ item.name }}</td><td class="center mono">{{ item.quantity }}</td><td class="item-stats">{{ 'Book' if item.is_book else 'Misc' }}</td></tr>{% endfor %}</table>{% else %}<p class="empty">None</p>{% endif %}</div>
 
         <!-- BIOGRAPHY -->
-        {% if biography %}
-        <div class="section">
-            <h2>Data</h2>
-            <p>{{ biography }}</p>
-        </div>
-        {% endif %}
-
+        {% if biography %}<div class="section"><h2>Data</h2><p>{{ biography }}</p></div>{% endif %}
     </div>
 
-    <!-- APPENDIX: SKILL DESCRIPTIONS -->
-    {% if include_appendix %}
-    <div class="page appendix">
-        <h2>Appendix: Skill Descriptions</h2>
-        {% for skill in skills %}
-        {% if skill.description %}
-        <div class="skill-detail">
-            <div class="skill-detail-name">{{ skill.name }}</div>
-            <div class="skill-detail-info">{{ skill.attribute }} | Rank {{ skill.rank }}{% if skill.tag %} | Tagged{% endif %}</div>
-            <div class="skill-detail-desc">{{ skill.description }}</div>
-        </div>
-        {% endif %}
-        {% endfor %}
-    </div>
-    {% endif %}
-
+    <!-- APPENDIX -->
+    {% if include_appendix %}<div class="page appendix"><h2>Appendix: Skill Descriptions</h2>{% for skill in skills %}{% if skill.description %}<div class="skill-detail"><div class="skill-detail-name">{{ skill.name }}</div><div class="skill-detail-info">{{ skill.attribute }} | Rank {{ skill.rank }}{% if skill.tag %} | Tagged{% endif %}</div><div class="skill-detail-desc">{{ skill.description }}</div></div>{% endif %}{% endfor %}</div>{% endif %}
 </body>
 </html>
