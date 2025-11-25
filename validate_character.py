@@ -78,7 +78,7 @@ class CharacterValidator:
                 self.health_warnings.append(f"Negative quantity: {item.get('name', 'unknown')} ({quantity})")
 
     def validate_completeness(self):
-        """Check for missing or empty fields."""
+        """Check for missing or empty fields that should be populated."""
         if not self.character.get_origin():
             self.completeness_issues.append("Origin is empty")
 
@@ -97,16 +97,10 @@ class CharacterValidator:
         tagged_skills = [s for s in skills if s.get('tag', False)]
         if self.character.type == 'character' and len(tagged_skills) == 0:
             self.completeness_issues.append("No tagged skills")
-        elif tagged_skills:
-            tag_names = [s['name'] for s in tagged_skills]
-            self.completeness_issues.append(f"Tagged skills ({len(tagged_skills)}): {', '.join(tag_names)}")
 
         # Check perks
         perks = self.character.get_perks()
-        if perks:
-            perk_names = [p['name'] for p in perks]
-            self.completeness_issues.append(f"Perks ({len(perks)}): {', '.join(perk_names)}")
-        else:
+        if not perks:
             self.completeness_issues.append("No perks")
 
         # Check equipped weapons
@@ -115,9 +109,6 @@ class CharacterValidator:
         if weapons and not equipped_weapons:
             weapon_names = [w['name'] for w in weapons]
             self.completeness_issues.append(f"No weapons equipped (available: {', '.join(weapon_names)})")
-        elif equipped_weapons:
-            weapon_names = [w['name'] for w in equipped_weapons]
-            self.completeness_issues.append(f"Equipped weapons: {', '.join(weapon_names)}")
 
         # Check equipped apparel
         if self.character.type != 'robot':
@@ -126,22 +117,14 @@ class CharacterValidator:
             if apparel and not equipped_apparel:
                 apparel_names = [a['name'] for a in apparel]
                 self.completeness_issues.append(f"No apparel equipped (available: {', '.join(apparel_names)})")
-            elif equipped_apparel:
-                apparel_names = [a['name'] for a in equipped_apparel]
-                self.completeness_issues.append(f"Equipped apparel: {', '.join(apparel_names)}")
 
         # Check for missing descriptions in items that should have them
-        items_missing_description = []
         for item in self.character.get_items():
             item_type = item.get('type')
-            if item_type not in ['skill', 'ammo']: # Types that often have no description
+            if item_type not in ['skill', 'ammo']:  # Types that often have no description
                 description = self.character.strip_html(item.get('system', {}).get('description', ''))
                 if not description:
-                    items_missing_description.append(f"{item.get('name', 'unknown')} ({item_type})")
-
-        if items_missing_description:
-            for item_info in items_missing_description:
-                self.completeness_issues.append(f"Missing description: {item_info}")
+                    self.completeness_issues.append(f"Missing description: {item.get('name', 'unknown')} ({item_type})")
 
     def run_validation(self):
         """Run all validation checks."""
@@ -181,18 +164,18 @@ class CharacterValidator:
         print()
 
         # Summary
-        total_issues = len(self.health_warnings) + len(self.completeness_issues)
         print("## Summary")
         print("-" * 70)
-        if total_issues == 0:
-            print("[OK] Validation PASSED - Character data is valid and complete")
+        if len(self.health_warnings) == 0 and len(self.completeness_issues) == 0:
+            print("[OK] Validation PASSED - No issues found")
+        elif len(self.health_warnings) == 0:
+            print(f"[OK] Validation PASSED - {len(self.completeness_issues)} info item(s)")
         else:
-            print(f"[i] Validation completed:")
-            print(f"   - Health warnings: {len(self.health_warnings)}")
-            print(f"   - Info items: {len(self.completeness_issues)}")
+            print(f"[!] Validation found {len(self.health_warnings)} warning(s)")
         print(f"\n{'='*70}\n")
 
-        return total_issues == 0
+        # Return True (success) if no health warnings - completeness issues are just info
+        return len(self.health_warnings) == 0
 
 def main():
     parser = argparse.ArgumentParser(
