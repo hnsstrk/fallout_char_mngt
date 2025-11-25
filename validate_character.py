@@ -31,57 +31,104 @@ class CharacterValidator:
         attrs = self.character.get_special_attributes()
         for attr_name, value in attrs.items():
             if value < 1:
-                self.health_warnings.append(f"S.P.E.C.I.A.L. {attr_name.upper()} is below 1: {value}")
+                self.health_warnings.append(f"{attr_name} is below 1: {value}")
             elif value > 15:
-                self.health_warnings.append(f"S.P.E.C.I.A.L. {attr_name.upper()} is unusually high: {value} (expected 1-10 range)")
+                self.health_warnings.append(f"{attr_name} is unusually high: {value} (expected 1-10)")
 
         # Validate level
         if self.character.level < 1:
-            self.health_warnings.append(f"Character level is invalid: {self.character.level} (expected >= 1)")
+            self.health_warnings.append(f"Level is invalid: {self.character.level} (expected >= 1)")
         elif self.character.level > 50:
-            self.health_warnings.append(f"Character level is unusually high: {self.character.level}")
+            self.health_warnings.append(f"Level is unusually high: {self.character.level}")
 
         # Validate health
         derived_stats = self.character.derived_stats
         if derived_stats['current_health'] < 0:
-            self.health_warnings.append(f"Current health is negative: {derived_stats['current_health']}")
+            self.health_warnings.append(f"Health is negative: {derived_stats['current_health']}")
         if derived_stats['max_health'] == 0:
-            self.health_warnings.append("Max health is 0 (likely needs calculation)")
+            self.health_warnings.append("Max health is 0 (calculated value should be higher)")
         if derived_stats['current_health'] > derived_stats['max_health'] > 0:
-            self.health_warnings.append(f"Current health ({derived_stats['current_health']}) exceeds max health ({derived_stats['max_health']})")
+            self.health_warnings.append(f"Health {derived_stats['current_health']} exceeds max {derived_stats['max_health']}")
 
         # Validate radiation
         if derived_stats['radiation'] < 0:
             self.health_warnings.append(f"Radiation is negative: {derived_stats['radiation']}")
+        elif derived_stats['radiation'] > 0:
+            self.health_warnings.append(f"Radiation level: {derived_stats['radiation']} (reduces max health)")
 
         # Validate body parts status
         for part in self.character.get_body_parts():
-            if part['status'].lower() not in ['healthy', 'injured', 'crippled']:
-                self.health_warnings.append(f"Body part '{part['name']}' has unusual status: '{part['status']}'")
+            status = part['status'].lower()
+            if status not in ['healthy', 'injured', 'crippled']:
+                self.health_warnings.append(f"{part['name']}: unusual status '{part['status']}'")
+            elif status == 'crippled':
+                self.health_warnings.append(f"{part['name']}: CRIPPLED")
+            elif status == 'injured':
+                self.health_warnings.append(f"{part['name']}: injured")
+
             if part['injuries_open'] > 0:
-                self.health_warnings.append(f"Body part '{part['name']}' has {part['injuries_open']} untreated injury/injuries")
+                self.health_warnings.append(f"{part['name']}: {part['injuries_open']} untreated injury(s)")
+            if part['injuries_treated'] > 0:
+                self.health_warnings.append(f"{part['name']}: {part['injuries_treated']} treated injury(s)")
 
         # Check for items with negative quantities
-        all_items = self.character.get_items()
-        for item in all_items:
-            if 'quantity' in item.get('system', {}) and item['system']['quantity'] < 0:
-                self.health_warnings.append(f"Item '{item.get('name', 'unknown')}' has negative quantity: {item['system']['quantity']}")
+        for item in self.character.get_items():
+            quantity = item.get('system', {}).get('quantity', 0)
+            if quantity < 0:
+                self.health_warnings.append(f"Negative quantity: {item.get('name', 'unknown')} ({quantity})")
 
     def validate_completeness(self):
         """Check for missing or empty fields."""
         if not self.character.get_origin():
-            self.completeness_issues.append("Character origin is empty")
+            self.completeness_issues.append("Origin is empty")
 
         if not self.character.get_biography():
-            self.completeness_issues.append("Character biography is empty (no background data)")
+            self.completeness_issues.append("Biography is empty (DATA tab)")
 
         # Check skill count
         skills = self.character.get_skills()
         if self.character.type == 'character':
             if not skills:
-                self.completeness_issues.append("Character has no skills")
+                self.completeness_issues.append("No skills found")
             elif len(skills) < 17:
-                self.completeness_issues.append(f"Character has only {len(skills)} skills (expected 17)")
+                self.completeness_issues.append(f"Only {len(skills)} skills (expected 17)")
+
+        # Check for tagged skills
+        tagged_skills = [s for s in skills if s.get('tag', False)]
+        if self.character.type == 'character' and len(tagged_skills) == 0:
+            self.completeness_issues.append("No tagged skills")
+        elif tagged_skills:
+            tag_names = [s['name'] for s in tagged_skills]
+            self.completeness_issues.append(f"Tagged skills ({len(tagged_skills)}): {', '.join(tag_names)}")
+
+        # Check perks
+        perks = self.character.get_perks()
+        if perks:
+            perk_names = [p['name'] for p in perks]
+            self.completeness_issues.append(f"Perks ({len(perks)}): {', '.join(perk_names)}")
+        else:
+            self.completeness_issues.append("No perks")
+
+        # Check equipped weapons
+        weapons = self.character.get_weapons()
+        equipped_weapons = [w for w in weapons if w.get('equipped', False)]
+        if weapons and not equipped_weapons:
+            weapon_names = [w['name'] for w in weapons]
+            self.completeness_issues.append(f"No weapons equipped (available: {', '.join(weapon_names)})")
+        elif equipped_weapons:
+            weapon_names = [w['name'] for w in equipped_weapons]
+            self.completeness_issues.append(f"Equipped weapons: {', '.join(weapon_names)}")
+
+        # Check equipped apparel
+        if self.character.type != 'robot':
+            apparel = self.character.get_apparel()
+            equipped_apparel = [a for a in apparel if a.get('equipped', False)]
+            if apparel and not equipped_apparel:
+                apparel_names = [a['name'] for a in apparel]
+                self.completeness_issues.append(f"No apparel equipped (available: {', '.join(apparel_names)})")
+            elif equipped_apparel:
+                apparel_names = [a['name'] for a in equipped_apparel]
+                self.completeness_issues.append(f"Equipped apparel: {', '.join(apparel_names)}")
 
         # Check for missing descriptions in items that should have them
         items_missing_description = []
@@ -93,7 +140,8 @@ class CharacterValidator:
                     items_missing_description.append(f"{item.get('name', 'unknown')} ({item_type})")
 
         if items_missing_description:
-            self.completeness_issues.append(f"{len(items_missing_description)} items are missing descriptions")
+            for item_info in items_missing_description:
+                self.completeness_issues.append(f"Missing description: {item_info}")
 
     def run_validation(self):
         """Run all validation checks."""
@@ -114,22 +162,22 @@ class CharacterValidator:
         print("## Health Checks")
         print("-" * 70)
         if self.health_warnings:
-            print(f"⚠️  Found {len(self.health_warnings)} warning(s):\n")
+            print(f"[!] Found {len(self.health_warnings)} warning(s):\n")
             for idx, warning in enumerate(self.health_warnings, 1):
                 print(f"  {idx}. {warning}")
         else:
-            print("✅ All health checks passed - no unusual values detected")
+            print("[OK] All health checks passed - no unusual values detected")
         print()
 
         # Completeness Report
         print("## Completeness Report")
         print("-" * 70)
         if self.completeness_issues:
-            print(f"ℹ️  Found {len(self.completeness_issues)} completeness issue(s):\n")
+            print(f"[i] Found {len(self.completeness_issues)} item(s):\n")
             for idx, issue in enumerate(self.completeness_issues, 1):
                 print(f"  {idx}. {issue}")
         else:
-            print("✅ Character data is complete - all expected fields populated")
+            print("[OK] Character data is complete - all expected fields populated")
         print()
 
         # Summary
@@ -137,11 +185,11 @@ class CharacterValidator:
         print("## Summary")
         print("-" * 70)
         if total_issues == 0:
-            print("✅ Validation PASSED - Character data is valid and complete")
+            print("[OK] Validation PASSED - Character data is valid and complete")
         else:
-            print(f"⚠️  Validation completed with {total_issues} total issue(s):")
+            print(f"[i] Validation completed:")
             print(f"   - Health warnings: {len(self.health_warnings)}")
-            print(f"   - Completeness issues: {len(self.completeness_issues)}")
+            print(f"   - Info items: {len(self.completeness_issues)}")
         print(f"\n{'='*70}\n")
 
         return total_issues == 0
