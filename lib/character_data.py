@@ -1,3 +1,4 @@
+import html
 import json
 import re
 from pathlib import Path
@@ -387,9 +388,6 @@ class Character:
             return ""
         # Remove HTML tags
         clean = re.sub(r'<[^>]+>', '', text)
-        # Decode common HTML entities
-        clean = clean.replace('&nbsp;', ' ')
-        clean = clean.replace('&lt;', '<')
-        clean = clean.replace('&gt;', '>')
-        clean = clean.replace('&amp;', '&')
+        # Decode all HTML entities (including &uuml;, &auml;, etc.)
+        clean = html.unescape(clean)
         return clean.strip()
