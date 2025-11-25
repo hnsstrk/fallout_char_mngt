@@ -3,3 +3,6 @@ fvtt_export/*.json
 
 # Generated character sheets (user-specific output)
 character_sheets/*.md
+
+# Python cache files
+__pycache__/
