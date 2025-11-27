@@ -126,9 +126,10 @@ class CharacterValidator:
                 if not description:
                     self.completeness_issues.append(f"Missing description: {item.get('name', 'unknown')} ({item_type})")
 
-    def run_validation(self):
+    def run_validation(self, verbose: bool = True):
         """Run all validation checks."""
-        print(f"Running validation for: {self.character.name}")
+        if verbose:
+            print(f"Running validation for: {self.character.name}")
         self.validate_health_checks()
         self.validate_completeness()
 
