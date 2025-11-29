@@ -2,8 +2,7 @@
 
 Offline character sheet generator for tabletop RPGs. Currently supports **Fallout: The Roleplaying Game** (2d20 system) via FoundryVTT exports.
 
-<!-- TODO: Add screenshot -->
-<!-- ![RPG Sheets TUI](docs/screenshots/tui-main.png) -->
+![RPG Sheets TUI](docs/screenshots/tui-main.png)
 
 ## Quick Start
 
