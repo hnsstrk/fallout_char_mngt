@@ -44,20 +44,19 @@ class CharacterListItem(ListItem):
         errors = len(validation_results.get('errors', []))
         warnings = len(validation_results.get('warnings', []))
 
-        # Determine status icon/color (using ASCII for terminal compatibility)
-        # Icons use escaped brackets for Rich markup compatibility
+        # Determine status icon/class (using ASCII for terminal compatibility)
         if errors > 0:
-            self.status_icon = "\\[X]"
-            self.status_color = "red"
+            self.status_icon = "[X]"
+            self.status_class = "status-error"
         elif warnings > 0:
-            self.status_icon = "\\[!]"
-            self.status_color = "yellow"
+            self.status_icon = "[!]"
+            self.status_class = "status-warning"
         else:
-            self.status_icon = "\\[ok]"
-            self.status_color = "green"
+            self.status_icon = "[ok]"
+            self.status_class = "status-ok"
 
     def compose(self) -> ComposeResult:
-        yield Label(f"[{self.status_color}]{self.status_icon}[/]  {self.char_name}", markup=True)
+        yield Label(f"{self.status_icon}  {self.char_name}", classes=self.status_class)
         yield Label(f"      {self.char_class}", classes="subtitle")
 
 class ErrorListItem(ListItem):
@@ -69,7 +68,7 @@ class ErrorListItem(ListItem):
         self.error_msg = str(error_msg)
 
     def compose(self) -> ComposeResult:
-        yield Label(f"[red]\\[X][/]  {self.filename}", markup=True)
+        yield Label(f"[X]  {self.filename}", classes="status-error")
         yield Label(f"      Load Error", classes="subtitle")
 
 
@@ -89,34 +88,45 @@ class CharacterDetails(Static):
         errors = validation.get('errors', [])
         warnings = validation.get('warnings', [])
 
+        # Get theme colors from app
+        theme = self.app.current_theme
+        success_color = str(theme.success)
+        warning_color = str(theme.warning)
+        error_color = str(theme.error)
+        primary_color = str(theme.primary)
+
         content = Text()
-        content.append(f"{info['name']}\n", style="bold underline cyan")
+        content.append(f"{info['name']}\n", style=f"bold underline {primary_color}")
         content.append(f"{info['class']} | {info['system']}\n\n", style="italic")
 
         content.append("Validation Status:\n", style="bold")
 
         if not errors and not warnings:
-            content.append("[ok] All checks passed!\n\n", style="green")
+            content.append("[ok] All checks passed!\n\n", style=success_color)
 
         if errors:
-            content.append(f"[X] {len(errors)} Critical Issues:\n", style="bold red")
+            content.append(f"[X] {len(errors)} Critical Issues:\n", style=f"bold {error_color}")
             for i, err in enumerate(errors, 1):
-                content.append(f"  {i}. {err}\n", style="red")
+                content.append(f"  {i}. {err}\n", style=error_color)
             content.append("\n")
 
         if warnings:
-            content.append(f"[!] {len(warnings)} Warnings/Suggestions:\n", style="bold yellow")
+            content.append(f"[!] {len(warnings)} Warnings/Suggestions:\n", style=f"bold {warning_color}")
             for i, warn in enumerate(warnings, 1):
-                content.append(f"  {i}. {warn}\n", style="yellow")
+                content.append(f"  {i}. {warn}\n", style=warning_color)
             content.append("\n")
 
         self.update(content)
 
     def show_error(self, filename, error):
+        # Get theme colors from app
+        theme = self.app.current_theme
+        error_color = str(theme.error)
+
         content = Text()
-        content.append(f"File: {filename}\n", style="bold underline red")
-        content.append("Critical Load Error\n\n", style="bold red")
-        content.append(f"Could not load character data:\n{error}\n", style="red")
+        content.append(f"File: {filename}\n", style=f"bold underline {error_color}")
+        content.append("Critical Load Error\n\n", style=f"bold {error_color}")
+        content.append(f"Could not load character data:\n{error}\n", style=error_color)
         content.append("\nThis file may be corrupted, or it might not be a valid Character export.", style="italic")
         self.update(content)
 
@@ -161,6 +171,18 @@ class CharacterManagerApp(App):
     .subtitle {
         color: $text-muted;
         text-style: italic;
+    }
+
+    .status-ok {
+        color: $success;
+    }
+
+    .status-warning {
+        color: $warning;
+    }
+
+    .status-error {
+        color: $error;
     }
 
     CharacterDetails {
