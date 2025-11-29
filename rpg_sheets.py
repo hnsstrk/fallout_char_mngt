@@ -45,19 +45,20 @@ class CharacterListItem(ListItem):
         warnings = len(validation_results.get('warnings', []))
 
         # Determine status icon/color (using ASCII for terminal compatibility)
+        # Icons use escaped brackets for Rich markup compatibility
         if errors > 0:
-            self.status_icon = "[X]"
+            self.status_icon = "\\[X]"
             self.status_color = "red"
         elif warnings > 0:
-            self.status_icon = "[!]"
+            self.status_icon = "\\[!]"
             self.status_color = "yellow"
         else:
-            self.status_icon = "[ok]"
+            self.status_icon = "\\[ok]"
             self.status_color = "green"
 
     def compose(self) -> ComposeResult:
-        yield Label(f"{self.status_icon}  {self.char_name}")
-        yield Label(f"    {self.char_class}", classes="subtitle")
+        yield Label(f"[{self.status_color}]{self.status_icon}[/]  {self.char_name}", markup=True)
+        yield Label(f"      {self.char_class}", classes="subtitle")
 
 class ErrorListItem(ListItem):
     """A list item representing a file that failed to load."""
@@ -68,8 +69,8 @@ class ErrorListItem(ListItem):
         self.error_msg = str(error_msg)
 
     def compose(self) -> ComposeResult:
-        yield Label(f"[X]  {self.filename}", classes="error")
-        yield Label(f"     Load Error", classes="subtitle")
+        yield Label(f"[red]\\[X][/]  {self.filename}", markup=True)
+        yield Label(f"      Load Error", classes="subtitle")
 
 
 class CharacterDetails(Static):

@@ -60,7 +60,7 @@ pip install -r requirements.txt
 The easiest way to manage characters is the interactive Terminal User Interface (TUI):
 
 ```bash
-python tui_app.py
+python rpg_sheets.py
 ```
 
 **Features:**
@@ -85,61 +85,17 @@ python tui_app.py
 3. Select "Export Data"
 4. Save the JSON file to the `fvtt_export/` directory
 
-### Generating Character Sheets
-
-Run the generator script with your character JSON file:
-
-```bash
-python generate_character_sheet.py fvtt_export/your-character-file.json
-```
-
-The generated character sheet will be saved to `character_sheets/`.
-
-#### Output Formats
-
-Use the `--format` option to select output format:
-
-```bash
-# Markdown (default)
-python generate_character_sheet.py fvtt_export/character.json
-
-# HTML (B&W print optimized)
-python generate_character_sheet.py fvtt_export/character.json --format html
-
-# HTML with skill descriptions appendix
-python generate_character_sheet.py fvtt_export/character.json --format html --appendix
-```
-
-#### Options
-
-| Option | Description |
-|--------|-------------|
-| `--format`, `-f` | Output format: `markdown` (default) or `html` |
-| `--appendix` | Include appendix with full skill descriptions (HTML only) |
+### Output Formats
 
 | Format | Output | Best For |
 |--------|--------|----------|
-| `markdown` | `.md` file | Text editors, version control |
-| `html` | `.html` file | Browser viewing, printing to PDF |
+| Markdown | `.md` file | Text editors, version control |
+| HTML | `.html` file | Browser viewing, printing to PDF |
+| HTML + Appendix | `.html` file | Includes full skill descriptions |
 
-**Example:**
-```bash
-python generate_character_sheet.py "fvtt_export/fvtt-Actor-character-name-ABC123XYZ.json" --format html
-```
-
-Output: `character_sheets/character_name.html`
+Generated sheets are saved to `character_sheets/`.
 
 **Printing to PDF:** Open the HTML file in your browser and use "Print to PDF" (Ctrl+P / Cmd+P). The HTML is optimized for A4 black & white printing.
-
-### Validating Character Data
-
-The TUI shows validation status for each character. For command-line validation:
-
-```bash
-python validate_character.py fvtt_export/your-character-file.json
-```
-
-The validator checks schema structure, data health (attribute ranges, conditions), and completeness (missing descriptions, unequipped items). Some warnings are expected - FoundryVTT stores derived statistics as 0, which the generator calculates automatically.
 
 ## Generated Character Sheet Contents
 
@@ -222,7 +178,7 @@ fallout_char_mngt/
 │   ├── system_interface.py        # Abstract system interface
 │   └── systems/                   # Game system implementations
 │       └── fallout.py             # Fallout 2d20 system handler
-├── tui_app.py                      # Interactive TUI application
+├── rpg_sheets.py                   # Interactive TUI application
 ├── generate_character_sheet.py    # CLI character sheet generator
 ├── validate_character.py           # Character data validation tool
 ├── requirements.txt                # Optional dependencies (jinja2, textual)

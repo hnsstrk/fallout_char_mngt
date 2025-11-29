@@ -1,5 +1,7 @@
 # Character exports (user-specific data)
 fvtt_export/*.json
+# Exception: Marcel as example character
+!fvtt_export/fvtt-Actor-marcel-*.json
 
 # Generated character sheets (user-specific output)
 character_sheets/*.md
