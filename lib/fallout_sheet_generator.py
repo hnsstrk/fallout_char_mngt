@@ -29,7 +29,7 @@ class CharacterSheetGenerator:
         self.character = character
         self.output_format = output_format
         self.include_appendix = include_appendix
-        self.template_dir = Path(__file__).parent / 'templates'
+        self.template_dir = Path(__file__).parent.parent / 'templates'
 
     def generate_markdown_sheet(self) -> str:
         """Generates the full character sheet in Markdown format."""
