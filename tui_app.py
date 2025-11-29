@@ -1,13 +1,25 @@
-from textual.app import App, ComposeResult
-from textual.widgets import Header, Footer, ListView, ListItem, Label, Static, Button
-from textual.containers import Container, Horizontal, Vertical, VerticalScroll
-from textual.screen import Screen
-from textual.binding import Binding
-from textual import on, work
-from rich.text import Text
-from pathlib import Path
+import sys
 import json
 import os
+from pathlib import Path
+
+try:
+    from textual.app import App, ComposeResult
+    from textual.widgets import Header, Footer, ListView, ListItem, Label, Static, Button
+    from textual.containers import Container, Horizontal, Vertical, VerticalScroll
+    from textual.screen import Screen
+    from textual.binding import Binding
+    from textual import on, work
+    from rich.text import Text
+except ImportError:
+    print("Error: Required package 'textual' is not installed.")
+    print()
+    print("Please install dependencies with:")
+    print("  pip install -r requirements.txt")
+    print()
+    print("Or install textual directly:")
+    print("  pip install textual")
+    sys.exit(1)
 
 from lib.system_interface import SystemInterface
 from lib.systems.fallout import FalloutSystem
@@ -32,15 +44,15 @@ class CharacterListItem(ListItem):
         errors = len(validation_results.get('errors', []))
         warnings = len(validation_results.get('warnings', []))
 
-        # Determine status icon/color
+        # Determine status icon/color (using ASCII for terminal compatibility)
         if errors > 0:
-            self.status_icon = "❌"
+            self.status_icon = "[X]"
             self.status_color = "red"
         elif warnings > 0:
-            self.status_icon = "⚠️ "
+            self.status_icon = "[!]"
             self.status_color = "yellow"
         else:
-            self.status_icon = "✅"
+            self.status_icon = "[ok]"
             self.status_color = "green"
 
     def compose(self) -> ComposeResult:
@@ -56,8 +68,8 @@ class ErrorListItem(ListItem):
         self.error_msg = str(error_msg)
 
     def compose(self) -> ComposeResult:
-        yield Label(f"❌  {self.filename}", classes="error")
-        yield Label(f"    Load Error", classes="subtitle")
+        yield Label(f"[X]  {self.filename}", classes="error")
+        yield Label(f"     Load Error", classes="subtitle")
 
 
 class CharacterDetails(Static):
@@ -83,16 +95,16 @@ class CharacterDetails(Static):
         content.append("Validation Status:\n", style="bold")
 
         if not errors and not warnings:
-            content.append("✅  All checks passed!\n\n", style="green")
+            content.append("[ok] All checks passed!\n\n", style="green")
 
         if errors:
-            content.append(f"❌  {len(errors)} Critical Issues:\n", style="bold red")
+            content.append(f"[X] {len(errors)} Critical Issues:\n", style="bold red")
             for i, err in enumerate(errors, 1):
                 content.append(f"  {i}. {err}\n", style="red")
             content.append("\n")
 
         if warnings:
-            content.append(f"⚠️   {len(warnings)} Warnings/Suggestions:\n", style="bold yellow")
+            content.append(f"[!] {len(warnings)} Warnings/Suggestions:\n", style="bold yellow")
             for i, warn in enumerate(warnings, 1):
                 content.append(f"  {i}. {warn}\n", style="yellow")
             content.append("\n")
@@ -206,8 +218,6 @@ class CharacterManagerApp(App):
         for child in sidebar.children:
             child.remove()
 
-        list_view = ListView(id="char_list")
-
         export_dir = Path("fvtt_export")
         if not export_dir.exists():
             sidebar.mount(Label("Directory 'fvtt_export' not found!"))
@@ -219,6 +229,7 @@ class CharacterManagerApp(App):
             return
 
         loaded_any = False
+        items_to_add = []
         for file_path in files:
             try:
                 with open(file_path, 'r', encoding='utf-8') as f:
@@ -240,23 +251,24 @@ class CharacterManagerApp(App):
                         item = CharacterListItem(info, handler, validation)
                         # Attach the full objects to the item for retrieval
                         item.character_obj = char
-                        list_view.append(item)
+                        items_to_add.append(item)
                         loaded_any = True
                     except Exception as e:
                         # Character matched system but failed to load (e.g. missing keys)
-                        list_view.append(ErrorListItem(file_path.name, e))
+                        items_to_add.append(ErrorListItem(file_path.name, e))
                         loaded_any = True
                 else:
                     # No system matched - consider it an unknown/invalid file
-                    list_view.append(ErrorListItem(file_path.name, "Unknown format or unsupported system"))
+                    items_to_add.append(ErrorListItem(file_path.name, "Unknown format or unsupported system"))
                     loaded_any = True
 
             except Exception as e:
                 # File read error or JSON parse error
-                list_view.append(ErrorListItem(file_path.name, f"JSON Error: {e}"))
+                items_to_add.append(ErrorListItem(file_path.name, f"JSON Error: {e}"))
                 loaded_any = True
 
         if loaded_any:
+            list_view = ListView(*items_to_add, id="char_list")
             sidebar.mount(list_view)
             list_view.focus()
         else:

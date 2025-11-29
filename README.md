@@ -14,12 +14,14 @@ Generate comprehensive printable character sheets from FoundryVTT JSON exports f
 - FoundryVTT character export (JSON format)
 - Fallout 2d20 system (tested with v11.14.3 - v11.16.4)
 
-### Optional Dependencies
+### Dependencies
 
-| Output Format | Required Packages |
-|---------------|-------------------|
-| Markdown | None (Python standard library) |
-| HTML | `jinja2` |
+All dependencies are listed in `requirements.txt`:
+
+| Package | Used For |
+|---------|----------|
+| `jinja2` | HTML character sheet output |
+| `textual` | Interactive TUI application |
 
 ## Installation
 
@@ -29,14 +31,52 @@ git clone https://github.com/hnsstrk/fallout_char_mngt.git
 cd fallout_char_mngt
 ```
 
-2. **For Markdown output**: No additional installation required.
+2. (Recommended) Create and activate a virtual environment:
+```bash
+# Create virtual environment
+python -m venv venv
 
-3. **For HTML output**: Install optional dependencies:
+# Activate (Linux/macOS)
+source venv/bin/activate
+
+# Activate (Windows PowerShell)
+.\venv\Scripts\Activate.ps1
+
+# Activate (Windows CMD)
+venv\Scripts\activate.bat
+```
+
+3. Install dependencies:
 ```bash
 pip install -r requirements.txt
 ```
 
+**Note:** The TUI application will display a helpful error message if dependencies are missing.
+
 ## Usage
+
+### Interactive TUI Application
+
+The easiest way to manage characters is the interactive Terminal User Interface (TUI):
+
+```bash
+python tui_app.py
+```
+
+**Features:**
+- Browse all characters in `fvtt_export/` with validation status indicators (`[ok]`, `[!]`, `[X]`)
+- View detailed validation reports for each character
+- Generate character sheets with a single keypress
+- Supports multiple output formats (Markdown, HTML, HTML with Appendix)
+
+**Keyboard Shortcuts:**
+| Key | Action |
+|-----|--------|
+| `M` | Generate Markdown sheet |
+| `H` | Generate HTML sheet |
+| `A` | Generate HTML with skill appendix |
+| `R` | Refresh character list |
+| `Q` | Quit |
 
 ### Exporting Characters from FoundryVTT
 
@@ -133,10 +173,10 @@ The validation tool checks for:
 **Validation Output:**
 
 The tool produces a detailed report with:
-- ✅ **Passed checks** - Green checkmarks for valid data
-- ⚠️  **Warnings** - Yellow warnings for unusual values
-- ❌ **Errors** - Red errors for missing required fields
-- ℹ️  **Info** - Blue notices for completeness issues
+- `[ok]` **Passed checks** - Green indicators for valid data
+- `[!]` **Warnings** - Yellow warnings for unusual values
+- `[X]` **Errors** - Red errors for missing required fields
+- `[i]` **Info** - Blue notices for completeness issues
 
 Example validation result:
 ```
@@ -149,24 +189,24 @@ Type: character
 
 ## Schema Validation
 ----------------------------------------------------------------------
-✅ Schema validation passed - all required fields present
+[ok] Schema validation passed - all required fields present
 
 ## Health Checks
 ----------------------------------------------------------------------
-⚠️  Found 2 warning(s):
+[!] Found 2 warning(s):
   1. Max health is 0 (likely needs calculation)
   2. Initiative value is 0 but should be calculated (PER + AGI)
 
 ## Completeness Report
 ----------------------------------------------------------------------
-ℹ️  Found 3 completeness issue(s):
+[i] Found 3 completeness issue(s):
   1. Next level XP is 0 (needs calculation)
   2. Items missing descriptions: custom item (miscellany)
   3. Character has 3 weapons but none equipped
 
 ## Summary
 ----------------------------------------------------------------------
-⚠️  Validation completed with 5 total issue(s):
+[!] Validation completed with 5 total issue(s):
    - Schema errors: 0
    - Health warnings: 2
    - Completeness issues: 3
@@ -445,9 +485,16 @@ fallout_char_mngt/
 ├── character_sheets/               # Generated character sheets (MD/HTML)
 ├── reference_data/                 # Calculation formulas and attribution
 ├── templates/                      # HTML templates for character sheets
-├── generate_character_sheet.py    # Character sheet generator
+├── lib/                            # Modular character logic library
+│   ├── character_data.py          # Core character data class
+│   ├── safe_path.py               # Secure path handling
+│   ├── system_interface.py        # Abstract system interface
+│   └── systems/                   # Game system implementations
+│       └── fallout.py             # Fallout 2d20 system handler
+├── tui_app.py                      # Interactive TUI application
+├── generate_character_sheet.py    # CLI character sheet generator
 ├── validate_character.py           # Character data validation tool
-├── requirements.txt                # Optional dependencies (jinja2)
+├── requirements.txt                # Optional dependencies (jinja2, textual)
 ├── CLAUDE.md                       # Development guidance
 └── README.md                       # This file
 ```
@@ -494,6 +541,12 @@ See [`reference_data/SOURCE.md`](./reference_data/SOURCE.md) for complete attrib
 - HTML output with B&W print optimized styling
 - Optional skill descriptions appendix (`--appendix` flag)
 - Browser "Print to PDF" workflow
+
+**Phase 2.2: TUI & Modularization** ✅ COMPLETED
+- Interactive Terminal UI (`tui_app.py`) for browsing and generating character sheets
+- Modular architecture with `lib/` library for reusable character logic
+- Plugin-style system interface for future game system support
+- Integrated validation with visual status indicators
 
 **Phase 3: Enhancement** (Future)
 - Layout optimization
