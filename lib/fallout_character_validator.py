@@ -25,75 +25,44 @@ class CharacterValidator:
         self.health_warnings = []
         self.completeness_issues = []
 
-    def validate_health_checks(self):
-        """Check for unusual or invalid values using data from the Character object."""
-        # Validate S.P.E.C.I.A.L. attributes
+    def validate_critical_data(self):
+        """Check for missing critical data required for the character to function."""
+        # Validate S.P.E.C.I.A.L. attributes - all 7 must be present and valid
         attrs = self.character.get_special_attributes()
-        for attr_name, value in attrs.items():
-            if value < 1:
-                self.health_warnings.append(f"{attr_name} is below 1: {value}")
-            elif value > 15:
-                self.health_warnings.append(f"{attr_name} is unusually high: {value} (expected 1-10)")
+        required_attrs = ['Strength', 'Perception', 'Endurance', 'Charisma', 'Intelligence', 'Agility', 'Luck']
+        for attr_name in required_attrs:
+            if attr_name not in attrs:
+                self.health_warnings.append(f"Missing attribute: {attr_name}")
+            elif attrs[attr_name] < 1:
+                self.health_warnings.append(f"{attr_name} is below 1: {attrs[attr_name]}")
 
-        # Validate level
+        # Validate level exists and is valid
         if self.character.level < 1:
             self.health_warnings.append(f"Level is invalid: {self.character.level} (expected >= 1)")
-        elif self.character.level > 50:
-            self.health_warnings.append(f"Level is unusually high: {self.character.level}")
 
-        # Validate health
+        # Validate derived stats can be calculated
         derived_stats = self.character.derived_stats
-        if derived_stats['current_health'] < 0:
-            self.health_warnings.append(f"Health is negative: {derived_stats['current_health']}")
         if derived_stats['max_health'] == 0:
-            self.health_warnings.append("Max health is 0 (calculated value should be higher)")
-        if derived_stats['current_health'] > derived_stats['max_health'] > 0:
-            self.health_warnings.append(f"Health {derived_stats['current_health']} exceeds max {derived_stats['max_health']}")
+            self.health_warnings.append("Max health is 0 (calculation error)")
 
-        # Validate radiation
-        if derived_stats['radiation'] < 0:
-            self.health_warnings.append(f"Radiation is negative: {derived_stats['radiation']}")
-        elif derived_stats['radiation'] > 0:
-            self.health_warnings.append(f"Radiation level: {derived_stats['radiation']} (reduces max health)")
-
-        # Validate body parts status
-        for part in self.character.get_body_parts():
-            status = part['status'].lower()
-            if status not in ['healthy', 'injured', 'crippled']:
-                self.health_warnings.append(f"{part['name']}: unusual status '{part['status']}'")
-            elif status == 'crippled':
-                self.health_warnings.append(f"{part['name']}: CRIPPLED")
-            elif status == 'injured':
-                self.health_warnings.append(f"{part['name']}: injured")
-
-            if part['injuries_open'] > 0:
-                self.health_warnings.append(f"{part['name']}: {part['injuries_open']} untreated injury(s)")
-            if part['injuries_treated'] > 0:
-                self.health_warnings.append(f"{part['name']}: {part['injuries_treated']} treated injury(s)")
-
-        # Check for items with negative quantities
-        for item in self.character.get_items():
-            quantity = item.get('system', {}).get('quantity', 0)
-            if quantity < 0:
-                self.health_warnings.append(f"Negative quantity: {item.get('name', 'unknown')} ({quantity})")
+        # Validate skills exist (required for character type)
+        if self.character.type == 'character':
+            skills = self.character.get_skills()
+            if not skills:
+                self.health_warnings.append("No skills found (required for character)")
+            elif len(skills) < 17:
+                self.health_warnings.append(f"Missing skills: only {len(skills)} of 17 found")
 
     def validate_completeness(self):
-        """Check for missing or empty fields that should be populated."""
+        """Check for optional but recommended fields (info only, not errors)."""
         if not self.character.get_origin():
             self.completeness_issues.append("Origin is empty")
 
         if not self.character.get_biography():
             self.completeness_issues.append("Biography is empty (DATA tab)")
 
-        # Check skill count
-        skills = self.character.get_skills()
-        if self.character.type == 'character':
-            if not skills:
-                self.completeness_issues.append("No skills found")
-            elif len(skills) < 17:
-                self.completeness_issues.append(f"Only {len(skills)} skills (expected 17)")
-
         # Check for tagged skills
+        skills = self.character.get_skills()
         tagged_skills = [s for s in skills if s.get('tag', False)]
         if self.character.type == 'character' and len(tagged_skills) == 0:
             self.completeness_issues.append("No tagged skills")
@@ -103,25 +72,24 @@ class CharacterValidator:
         if not perks:
             self.completeness_issues.append("No perks")
 
-        # Check equipped weapons
+        # Check equipped weapons (not stashed = equipped)
         weapons = self.character.get_weapons()
-        equipped_weapons = [w for w in weapons if w.get('equipped', False)]
+        equipped_weapons = [w for w in weapons if not w.get('system', {}).get('stashed', False)]
         if weapons and not equipped_weapons:
-            weapon_names = [w['name'] for w in weapons]
-            self.completeness_issues.append(f"No weapons equipped (available: {', '.join(weapon_names)})")
+            self.completeness_issues.append(f"No weapons equipped ({len(weapons)} available)")
 
-        # Check equipped apparel
+        # Check equipped apparel (not stashed = equipped)
         if self.character.type != 'robot':
             apparel = self.character.get_apparel()
-            equipped_apparel = [a for a in apparel if a.get('equipped', False)]
+            equipped_apparel = [a for a in apparel if not a.get('system', {}).get('stashed', False)]
             if apparel and not equipped_apparel:
-                apparel_names = [a['name'] for a in apparel]
-                self.completeness_issues.append(f"No apparel equipped (available: {', '.join(apparel_names)})")
+                self.completeness_issues.append(f"No apparel equipped ({len(apparel)} available)")
 
-        # Check for missing descriptions in items that should have them
+        # Check for missing descriptions in important items
         for item in self.character.get_items():
             item_type = item.get('type')
-            if item_type not in ['skill', 'ammo']:  # Types that often have no description
+            # Only check perks and traits - they should have descriptions
+            if item_type in ['perk', 'trait']:
                 description = self.character.strip_html(item.get('system', {}).get('description', ''))
                 if not description:
                     self.completeness_issues.append(f"Missing description: {item.get('name', 'unknown')} ({item_type})")
@@ -130,7 +98,7 @@ class CharacterValidator:
         """Run all validation checks."""
         if verbose:
             print(f"Running validation for: {self.character.name}")
-        self.validate_health_checks()
+        self.validate_critical_data()
         self.validate_completeness()
 
     def print_report(self) -> bool:
@@ -181,7 +149,7 @@ class CharacterValidator:
 def main():
     parser = argparse.ArgumentParser(
         description="Validate FVTT Fallout character JSON exports.",
-        epilog="Example:\n  python validate_character.py fvtt_export/character.json"
+        epilog="Example:\n  python -m lib.fallout_validator fvtt_export/character.json"
     )
     parser.add_argument('character_file', type=Path, help='Path to FVTT character JSON file')
     args = parser.parse_args()

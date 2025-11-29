@@ -3,8 +3,8 @@ from typing import Dict, List, Any
 import json
 from lib.system_interface import SystemInterface
 from lib.character_data import Character
-from validate_character import CharacterValidator
-from generate_character_sheet import CharacterSheetGenerator
+from lib.fallout_character_validator import CharacterValidator
+from lib.fallout_sheet_generator import CharacterSheetGenerator
 
 class FalloutSystem(SystemInterface):
     """Handler for Fallout: The Roleplaying Game (FVTT export)."""

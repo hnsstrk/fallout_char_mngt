@@ -215,9 +215,8 @@ class CharacterManagerApp(App):
 
     def refresh_character_list(self):
         sidebar = self.query_one("#sidebar", Vertical)
-        # Clear existing items (brute force removal)
-        for child in sidebar.children:
-            child.remove()
+        # Clear existing items
+        sidebar.remove_children()
 
         export_dir = Path("fvtt_export")
         if not export_dir.exists():
@@ -275,7 +274,22 @@ class CharacterManagerApp(App):
         else:
             sidebar.mount(Label("No JSON files found."))
 
+    def on_list_view_highlighted(self, event: ListView.Highlighted) -> None:
+        """Update details when a character is highlighted (cursor moved)."""
+        if event.item is None:
+            return
+        item = event.item
+        details = self.query_one(CharacterDetails)
+
+        if isinstance(item, CharacterListItem):
+            details.show_character(item.character_obj, item.system_handler, item.validation_results)
+        elif isinstance(item, ErrorListItem):
+            details.show_error(item.filename, item.error_msg)
+
     def on_list_view_selected(self, event: ListView.Selected) -> None:
+        """Handle Enter key on a character (same as highlight for now)."""
+        if event.item is None:
+            return
         item = event.item
         details = self.query_one(CharacterDetails)
 
