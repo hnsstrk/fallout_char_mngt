@@ -14,6 +14,7 @@ from datetime import datetime
 # Import shared library components
 from lib.character_data import Character
 from lib.safe_path import validate_path
+from lib.utils import sanitize_filename
 
 # Optional dependency for HTML output
 try:
@@ -283,7 +284,7 @@ def main():
         # Save the output file
         output_dir = Path('character_sheets')
         output_dir.mkdir(exist_ok=True)
-        safe_name = "".join(c for c in character.name if c.isalnum() or c in (' ', '_')).rstrip().replace(' ', '_').lower()
+        safe_name = sanitize_filename(character.name)
         output_file = output_dir / f"{safe_name}.{extension}"
 
         with open(output_file, 'w', encoding='utf-8') as f:

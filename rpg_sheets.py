@@ -23,6 +23,7 @@ except ImportError:
 
 from lib.system_interface import SystemInterface
 from lib.systems.fallout import FalloutSystem
+from lib.utils import sanitize_filename
 
 # Register available systems
 SYSTEMS: list[SystemInterface] = [
@@ -355,7 +356,7 @@ class CharacterManagerApp(App):
             output_dir.mkdir(exist_ok=True)
 
             # Generate filename
-            safe_name = "".join(c for c in char.name if c.isalnum() or c in (' ', '_')).rstrip().replace(' ', '_').lower()
+            safe_name = sanitize_filename(char.name)
             ext = 'html' if format_type == 'html' else 'md'
             output_file = output_dir / f"{safe_name}.{ext}"
 
