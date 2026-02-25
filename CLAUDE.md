@@ -21,6 +21,14 @@ The primary objective is to create complete character sheets that include:
 
 These comprehensive offline character sheets are essential because the group has limited opportunities to play offline, and when they do, players need complete access to all character information without FoundryVTT.
 
+## Task Management
+
+Offene Tasks fuer dieses Projekt werden in **Taskwarrior** verwaltet (Projekt: `fallout_char_mngt`).
+
+```bash
+task project:fallout_char_mngt list    # Alle offenen Tasks
+```
+
 ## Project Phases and Approach
 
 ### Phase 1: Analysis ✅ COMPLETED
