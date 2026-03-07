@@ -28,9 +28,13 @@ class CharacterSheetGenerator:
 
     def __init__(self, character: Character, output_format: str = 'markdown', include_appendix: bool = False):
         self.character = character
-        self.output_format = output_format
         self.include_appendix = include_appendix
         self.template_dir = Path(__file__).parent.parent / 'templates'
+
+    @staticmethod
+    def _escape_md(text) -> str:
+        """Escape pipe characters for Markdown table cells."""
+        return str(text).replace('|', '\\|').replace('\n', ' ')
 
     def generate_markdown_sheet(self) -> str:
         """Generates the full character sheet in Markdown format."""
@@ -46,9 +50,8 @@ class CharacterSheetGenerator:
         if trait:
             md += self._generate_trait(trait)
 
-        # Add placeholder sections for addictions and diseases
-        md += "## Addictions\n\n*None*\n\n"
-        md += "## Diseases\n\n*None*\n\n"
+        md += self._generate_addictions()
+        md += self._generate_diseases()
 
         md += self._generate_weapons_and_ammo()
 
@@ -82,20 +85,28 @@ class CharacterSheetGenerator:
 
     def _generate_derived_stats(self) -> str:
         stats = self.character.derived_stats
+        luck_points = self.character.get_luck_points()
+        currency = self.character.get_currency()
         md = "## Derived Statistics\n\n| Statistic | Value |\n|-----------|-------|\n"
         md += f"| **Health** | {stats['current_health']} / {stats['max_health']} |\n"
         md += f"| **Defense** | {stats['defense']} |\n"
         md += f"| **Initiative** | {stats['initiative']} |\n"
         md += f"| **Melee Damage** | +{stats['melee_damage']} |\n"
         md += f"| **Carry Weight** | {stats['carry_weight_current']} / {stats['carry_weight_total']} lbs |\n"
-        md += f"| **Radiation** | {stats['radiation']} |\n\n"
+        md += f"| **Radiation** | {stats['radiation']} |\n"
+        md += f"| **Luck Points** | {luck_points} |\n"
+        md += f"| **Caps** | {currency['caps']} |\n"
+        if currency['other']:
+            md += f"| **Other Currency** | {currency['other']} |\n"
+        md += "\n"
         return md
 
     def _generate_conditions(self) -> str:
         conditions = self.character.get_conditions()
         md = "## Conditions\n\n| Condition | Value |\n|-----------|-------|\n"
         for name, value in conditions.items():
-            md += f"| {name} | {'Yes' if isinstance(value, bool) and value else ('No' if isinstance(value, bool) else value)} |\n"
+            display_value = 'Yes' if isinstance(value, bool) and value else ('No' if isinstance(value, bool) else value)
+            md += f"| {self._escape_md(name)} | {self._escape_md(display_value)} |\n"
         return md + "\n"
 
     def _generate_body_status(self) -> str:
@@ -104,7 +115,7 @@ class CharacterSheetGenerator:
         for part in parts:
             injury_str = f"{part['injuries_open']} open, {part['injuries_treated']} treated" if (part['injuries_open'] + part['injuries_treated']) > 0 else "None"
             res_str = f"{part['energy_res']}/{part['physical_res']}/{part['poison_res']}/{part['radiation_res']}"
-            md += f"| {part['name']} | {part['status']} | {injury_str} | {res_str} |\n"
+            md += f"| {self._escape_md(part['name'])} | {self._escape_md(part['status'])} | {self._escape_md(injury_str)} | {self._escape_md(res_str)} |\n"
         return md + "\n"
 
     def _generate_skills(self) -> str:
@@ -112,7 +123,7 @@ class CharacterSheetGenerator:
         md = "## Skills\n\n| Skill | Tag | Rank | Attribute | Description |\n|-------|-----|------|-----------|-------------|\n"
         for skill in skills:
             desc_oneline = ' '.join(skill['description'].splitlines())
-            md += f"| {skill['name']} | {skill['tag']} | {skill['rank']} | {skill['attribute']} | {desc_oneline} |\n"
+            md += f"| {self._escape_md(skill['name'])} | {skill['tag']} | {skill['rank']} | {skill['attribute']} | {self._escape_md(desc_oneline)} |\n"
         return md + "\n"
 
     def _generate_perks(self) -> str:
@@ -129,6 +140,30 @@ class CharacterSheetGenerator:
         if not trait: return ""
         return f"## Trait\n\n### {trait['name']}\n\n{trait['description']}\n\n"
 
+    def _generate_addictions(self) -> str:
+        """Generates the addictions section with real character data."""
+        addictions = self.character.get_addictions()
+        md = "## Addictions\n\n"
+        if not addictions:
+            return md + "*None*\n\n"
+        for item in addictions:
+            md += f"### {self._escape_md(item['name'])}\n\n"
+            if item['description']:
+                md += f"{item['description']}\n\n"
+        return md
+
+    def _generate_diseases(self) -> str:
+        """Generates the diseases section with real character data."""
+        diseases = self.character.get_diseases()
+        md = "## Diseases\n\n"
+        if not diseases:
+            return md + "*None*\n\n"
+        for item in diseases:
+            md += f"### {self._escape_md(item['name'])}\n\n"
+            if item['description']:
+                md += f"{item['description']}\n\n"
+        return md
+
     def _generate_weapons_and_ammo(self) -> str:
         weapons = self.character.get_weapons()
         ammo = self.character.get_ammo()
@@ -141,7 +176,9 @@ class CharacterSheetGenerator:
             if w['fire_rate']: md += f"- **Fire Rate**: {w['fire_rate']}\n"
             if w['range']: md += f"- **Range**: {w['range']}\n"
             if w['qualities']: md += f"- **Qualities**: {w['qualities']}\n"
+            if w.get('weapon_qualities'): md += f"- **Weapon Qualities**: {self._escape_md(w['weapon_qualities'])}\n"
             if w['effects']: md += f"- **Effects**: {w['effects']}\n"
+            if w.get('damage_effects'): md += f"- **Damage Effects**: {self._escape_md(w['damage_effects'])}\n"
             if w['description']: md += f"\n{w['description']}\n"
             md += "\n"
 
@@ -226,15 +263,20 @@ class CharacterSheetGenerator:
         )
         template = env.get_template('character_sheet.html')
 
+        conditions = self.character.get_conditions()
         context = {
             'character': self.character,
             'attributes': self.character.get_special_attributes(),
             'derived': self.character.derived_stats,
-            'conditions': self.character.get_conditions(),
+            'conditions': conditions,
+            'numeric_conditions': {k: v for k, v in conditions.items() if isinstance(v, (int, float)) and not isinstance(v, bool)},
+            'boolean_conditions': {k: v for k, v in conditions.items() if isinstance(v, bool)},
             'body_parts': self.character.get_body_parts(),
             'skills': self.character.get_skills(),
             'perks': self.character.get_perks(),
             'trait': self.character.get_trait(),
+            'addictions': self.character.get_addictions(),
+            'diseases': self.character.get_diseases(),
             'weapons': self.character.get_weapons(),
             'ammo': self.character.get_ammo(),
             'apparel': self.character.get_apparel(),
@@ -244,6 +286,8 @@ class CharacterSheetGenerator:
             'gear': self.character.get_misc_gear(),
             'is_robot': self.character.type == 'robot',
             'biography': self.character.get_biography(),
+            'luck_points': self.character.get_luck_points(),
+            'currency': self.character.get_currency(),
             'generated_date': datetime.now().strftime('%Y-%m-%d %H:%M'),
             'include_appendix': self.include_appendix
         }

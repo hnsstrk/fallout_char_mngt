@@ -9,6 +9,7 @@ try:
     from textual.containers import Container, Horizontal, Vertical, VerticalScroll
     from textual.screen import Screen
     from textual.binding import Binding
+    from textual.css.query import NoMatches
     from textual import on, work
     from rich.text import Text
 except ImportError:
@@ -267,7 +268,7 @@ class CharacterManagerApp(App):
 
                 if handler:
                     try:
-                        char = handler.load_character(file_path)
+                        char = handler.load_character(file_path, data=data)
                         validation = handler.validate(char)
                         info = handler.get_character_info(char)
 
@@ -336,7 +337,7 @@ class CharacterManagerApp(App):
             if list_view.index is not None:
                 item = list_view.children[list_view.index]
                 return item
-        except:
+        except (NoMatches, IndexError):
             pass
         return None
 

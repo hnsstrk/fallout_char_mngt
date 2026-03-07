@@ -7,15 +7,16 @@ from typing import Any, Dict, List
 class Character:
     """Represents a character, loading and parsing data from a JSON file."""
 
-    def __init__(self, character_file: Path):
+    def __init__(self, character_file: Path, data: dict = None):
         """
-        Loads and initializes character data from a JSON file.
+        Loads and initializes character data from a JSON file or a provided dict.
 
         Args:
             character_file: Path to the character's JSON export file.
+            data: Optional pre-loaded character data dict. If provided, file loading is skipped.
         """
         self.character_file = character_file
-        self.data = self._load_character_data()
+        self.data = data if data is not None else self._load_character_data()
 
         self.name: str = self.data.get('name', 'Unknown')
         self.type: str = self.data.get('type', 'character')
@@ -257,19 +258,66 @@ class Character:
     def get_weapons(self) -> List[Dict[str, Any]]:
         """Returns a formatted list of weapons."""
         weapons_data = self.get_items(type_filter=['weapon'])
-        return [
-            {
+        result = []
+        for weapon in weapons_data:
+            damage_data = weapon.get('system', {}).get('damage', {})
+
+            # K5: Read damageType from structured object with booleans
+            damage_type_obj = damage_data.get('damageType', {})
+            damage_types = [k.capitalize() for k, v in damage_type_obj.items() if v]
+            damage_type_str = '/'.join(damage_types) if damage_types else damage_data.get('type', '')
+
+            # W2: Damage Effects (e.g. Piercing 1, Burst, Stun)
+            damage_effect_obj = damage_data.get('damageEffect', {})
+            damage_effects = []
+            for effect, val in damage_effect_obj.items():
+                if isinstance(val, dict):
+                    # Structured format: {rank, value} — active when value > 0
+                    if val.get('value', 0) > 0:
+                        rank = val.get('rank', 0)
+                        clean_name = effect.rstrip('_x').replace('_', ' ').capitalize()
+                        if rank > 0 and effect.endswith('_x'):
+                            damage_effects.append(f"{clean_name} {int(val['value'] * rank)}")
+                        else:
+                            damage_effects.append(clean_name)
+                elif isinstance(val, bool) and val:
+                    damage_effects.append(effect.replace('_', ' ').capitalize())
+                elif isinstance(val, (int, float)) and val > 0:
+                    clean_name = effect.rstrip('_x').replace('_', ' ').capitalize()
+                    damage_effects.append(f"{clean_name} {int(val)}")
+
+            # W2: Weapon Qualities (e.g. Accurate, Close Quarters, Reliable)
+            weapon_quality_obj = damage_data.get('weaponQuality', {})
+            weapon_qualities = []
+            for quality, val in weapon_quality_obj.items():
+                if isinstance(val, dict):
+                    # Structured format: {rank, value} — active when value > 0
+                    if val.get('value', 0) > 0:
+                        rank = val.get('rank', 0)
+                        clean_name = quality.rstrip('_x').replace('_', ' ').capitalize()
+                        if rank > 0 and quality.endswith('_x'):
+                            weapon_qualities.append(f"{clean_name} {int(val['value'] * rank)}")
+                        else:
+                            weapon_qualities.append(clean_name)
+                elif isinstance(val, bool) and val:
+                    weapon_qualities.append(quality.replace('_', ' ').replace(' x', '').capitalize())
+                elif isinstance(val, (int, float)) and val > 0:
+                    clean_name = quality.rstrip('_x').replace('_', ' ').capitalize()
+                    weapon_qualities.append(f"{clean_name} {int(val)}")
+
+            result.append({
                 'name': weapon.get('name', 'Unknown'),
-                'damage': weapon.get('system', {}).get('damage', {}).get('rating', 0),
-                'damage_type': weapon.get('system', {}).get('damage', {}).get('type', ''),
+                'damage': damage_data.get('rating', 0),
+                'damage_type': damage_type_str,
+                'damage_effects': ', '.join(damage_effects) if damage_effects else '',
+                'weapon_qualities': ', '.join(weapon_qualities) if weapon_qualities else '',
                 'qualities': self.strip_html(weapon.get('system', {}).get('qualities', '')),
                 'effects': self.strip_html(weapon.get('system', {}).get('effects', '')),
                 'fire_rate': weapon.get('system', {}).get('fireRate', 0),
                 'range': weapon.get('system', {}).get('range', ''),
                 'description': self.strip_html(weapon.get('system', {}).get('description', '')),
-            }
-            for weapon in weapons_data
-        ]
+            })
+        return result
 
     def get_apparel(self) -> List[Dict[str, Any]]:
         """Returns a formatted list of apparel."""
@@ -354,6 +402,40 @@ class Character:
                 'description': self.strip_html(item.get('system', {}).get('description', '')),
             }
             for item in ammo_data
+        ]
+
+    def get_luck_points(self) -> int:
+        """Returns the character's current luck points."""
+        return self.system.get('luckPoints', 0)
+
+    def get_currency(self) -> Dict[str, int]:
+        """Returns the character's currency (caps and other)."""
+        currency = self.system.get('currency', {})
+        return {
+            'caps': currency.get('caps', 0),
+            'other': currency.get('other', 0),
+        }
+
+    def get_addictions(self) -> List[Dict[str, Any]]:
+        """Returns a list of the character's addictions."""
+        addiction_data = self.get_items(type_filter=['addiction'])
+        return [
+            {
+                'name': item.get('name', 'Unknown'),
+                'description': self.strip_html(item.get('system', {}).get('description', '')),
+            }
+            for item in addiction_data
+        ]
+
+    def get_diseases(self) -> List[Dict[str, Any]]:
+        """Returns a list of the character's diseases."""
+        disease_data = self.get_items(type_filter=['disease'])
+        return [
+            {
+                'name': item.get('name', 'Unknown'),
+                'description': self.strip_html(item.get('system', {}).get('description', '')),
+            }
+            for item in disease_data
         ]
 
     def _load_character_data(self) -> Dict[str, Any]:

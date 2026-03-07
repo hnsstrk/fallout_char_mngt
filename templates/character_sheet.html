@@ -39,6 +39,8 @@
         .item-name { font-weight: bold; }
         .item-desc { font-size: 8pt; color: #333; margin-top: 2px; }
         .item-stats { font-size: 8pt; color: #666; }
+        .item-block { margin-bottom: 6px; padding-bottom: 4px; border-bottom: 1px dashed #ccc; }
+        .item-block:last-child { border-bottom: none; }
         .perk-item { margin-bottom: 8px; padding-bottom: 5px; border-bottom: 1px dashed #ccc; }
         .perk-item:last-child { border-bottom: none; }
         .perk-name { font-weight: bold; }
@@ -97,6 +99,11 @@
                                 <td><div class="stat-name">Carry</div><div class="stat-value">{{ derived.carry_weight_current }}/{{ derived.carry_weight_total }}</div></td>
                                 <td><div class="stat-name">Radiation</div><div class="stat-value">{{ derived.radiation }}</div></td>
                             </tr>
+                            <tr>
+                                <td><div class="stat-name">Luck Points</div><div class="stat-value">{{ luck_points }}</div></td>
+                                <td><div class="stat-name">Caps</div><div class="stat-value">{{ currency.caps }}</div></td>
+                                <td>{% if currency.other %}<div class="stat-name">Other</div><div class="stat-value">{{ currency.other }}</div>{% endif %}</td>
+                            </tr>
                         </table>
                     </div>
                 </td>
@@ -110,13 +117,13 @@
                     <div class="section">
                         <h2>Conditions</h2>
                         <table class="conditions-table">
-                           <tr>
-                                {% for name, value in conditions.items() if value is not boolean %}
+                            <tr>
+                                {% for name, value in numeric_conditions.items() %}
                                 <td>{{ name }}: {{ value }}</td>
                                 {% endfor %}
                             </tr>
                             <tr>
-                                {% for name, value in conditions.items() if value is boolean %}
+                                {% for name, value in boolean_conditions.items() %}
                                 <td{% if value %} class="active"{% endif %} colspan="2">{{ name }}: {{ 'Yes' if value else 'No' }}</td>
                                 {% endfor %}
                             </tr>
@@ -129,6 +136,7 @@
                         <table class="body-table">
                             <tr>
                                 <th>Part</th>
+                                <th class="res-header center">Status</th>
                                 <th class="res-header center">E</th>
                                 <th class="res-header center">P</th>
                                 <th class="res-header center">Po</th>
@@ -136,7 +144,8 @@
                             </tr>
                             {% for part in body_parts %}
                             <tr>
-                                <td>{{ part.name }}</td>
+                                <td>{{ part.name }}{% if part.injuries_open or part.injuries_treated %} <span class="item-stats">({{ part.injuries_open }}o/{{ part.injuries_treated }}t)</span>{% endif %}</td>
+                                <td class="center">{{ part.status }}</td>
                                 <td class="center mono">{{ part.energy_res }}</td>
                                 <td class="center mono">{{ part.physical_res }}</td>
                                 <td class="center mono">{{ part.poison_res }}</td>
@@ -162,9 +171,15 @@
 
         <!-- PERKS + TRAIT -->
         <table class="two-col">
-            <tr><td><div class="section"><h2>Perks</h2>{% if perks %}{% for perk in perks %}<div class="perk-item"><span class="perk-name">{{ perk.name }}</span>{% if perk.rank > 1 %}<span class="item-stats">(Rank {{ perk.rank }})</span>{% endif %}{% if perk.description %}<div class="perk-desc">{{ perk.description }}</div>{% endif %}</div>{% endfor %}{% else %}<p class="empty">None</p>{% endif %}</div></td>
+            <tr><td><div class="section"><h2>Perks</h2>{% if perks %}{% for perk in perks %}<div class="perk-item"><span class="perk-name">{{ perk.name }}</span>{% if perk.rank > 1 %}<span class="item-stats">(Rank {{ perk.rank }})</span>{% endif %}{% if perk.description %}<div class="perk-desc">{{ perk.description }}</div>{% endif %}{% if perk.requirements %}<div class="item-stats">Requirements: {{ perk.requirements }}</div>{% endif %}</div>{% endfor %}{% else %}<p class="empty">None</p>{% endif %}</div></td>
                 <td><div class="section"><h2>Trait</h2>{% if trait %}<div class="perk-item"><span class="perk-name">{{ trait.name }}</span>{% if trait.description %}<div class="perk-desc">{{ trait.description }}</div>{% endif %}</div>{% else %}<p class="empty">None</p>{% endif %}</div></td></tr>
         </table>
+
+        <!-- ADDICTIONS -->
+        <div class="section"><h2>Addictions</h2>{% if addictions %}{% for item in addictions %}<div class="item-block"><span class="item-name">{{ item.name }}</span>{% if item.description %}<div class="item-desc">{{ item.description }}</div>{% endif %}</div>{% endfor %}{% else %}<p class="empty">None</p>{% endif %}</div>
+
+        <!-- DISEASES -->
+        <div class="section"><h2>Diseases</h2>{% if diseases %}{% for item in diseases %}<div class="item-block"><span class="item-name">{{ item.name }}</span>{% if item.description %}<div class="item-desc">{{ item.description }}</div>{% endif %}</div>{% endfor %}{% else %}<p class="empty">None</p>{% endif %}</div>
 
         <!-- WEAPONS -->
         <div class="section">
@@ -172,14 +187,27 @@
             {% if weapons %}
                 <table>
                     <tr><th>Weapon</th><th class="center">Damage</th><th class="center">Range</th><th class="center">Rate</th><th>Qualities</th></tr>
-                    {% for w in weapons %}<tr><td class="item-name">{{ w.name }}</td><td class="center">{{ w.damage }} {{ w.damage_type }}</td><td class="center">{{ w.range or '-' }}</td><td class="center">{{ w.fire_rate or '-' }}</td><td>{{ w.qualities or '-' }}</td></tr>{% endfor %}
+                    {% for w in weapons %}<tr><td class="item-name">{{ w.name }}</td><td class="center">{{ w.damage }} {{ w.damage_type }}</td><td class="center">{{ w.range or '-' }}</td><td class="center">{{ w.fire_rate or '-' }}</td><td>{{ w.qualities or w.weapon_qualities or '-' }}</td></tr>
+                    {% if w.effects or w.damage_effects %}<tr><td colspan="5" class="item-desc"><strong>Effects:</strong> {{ w.effects }}{% if w.effects and w.damage_effects %}, {% endif %}{{ w.damage_effects }}</td></tr>{% endif %}
+                    {% if w.description %}<tr><td colspan="5" class="item-desc">{{ w.description }}</td></tr>{% endif %}
+                    {% endfor %}
                 </table>
             {% else %}<p class="empty">None</p>{% endif %}
-            {% if ammo %}<h3>Ammunition</h3><table><tr><th>Type</th><th class="center" style="width:60px">Qty</th></tr>{% for item in ammo %}<tr><td>{{ item.name }}</td><td class="center mono">{{ item.quantity }}</td></tr>{% endfor %}</table>{% endif %}
+            {% if ammo %}<h3>Ammunition</h3><table><tr><th>Type</th><th class="center" style="width:60px">Qty</th></tr>
+            {% for item in ammo %}<tr><td>{{ item.name }}</td><td class="center mono">{{ item.quantity }}</td></tr>
+            {% if item.description %}<tr><td colspan="2" class="item-desc">{{ item.description }}</td></tr>{% endif %}
+            {% endfor %}</table>{% endif %}
         </div>
 
         <!-- APPAREL -->
-        <div class="section"><h2>Apparel</h2>{% if apparel %}<table><tr><th>Item</th><th>Locations</th><th>Resistances</th></tr>{% for item in apparel %}<tr><td class="item-name">{{ item.name }}</td><td>{{ item.locations or '-' }}</td><td>{{ item.resistances or '-' }}</td></tr>{% endfor %}</table>{% else %}<p class="empty">None</p>{% endif %}</div>
+        <div class="section"><h2>Apparel</h2>
+        {% if apparel %}<table><tr><th>Item</th><th>Locations</th><th>Resistances</th></tr>
+        {% for item in apparel %}
+        <tr><td class="item-name">{{ item.name }}</td><td>{{ item.locations or '-' }}</td><td>{{ item.resistances or '-' }}</td></tr>
+        {% if item.description %}<tr><td colspan="3" class="item-desc">{{ item.description }}</td></tr>{% endif %}
+        {% endfor %}
+        </table>{% else %}<p class="empty">None</p>{% endif %}
+        </div>
 
         <!-- ROBOT-SPECIFIC SECTIONS -->
         {% if is_robot %}
@@ -188,8 +216,26 @@
         {% endif %}
 
         <!-- INVENTORY -->
-        <div class="section"><h2>Consumables</h2>{% if consumables %}<table><tr><th>Item</th><th class="center" style="width:40px">Qty</th><th>Effect</th></tr>{% for item in consumables %}<tr><td class="item-name">{{ item.name }}</td><td class="center mono">{{ item.quantity }}</td><td class="item-stats">{{ item.description[:80] ~ '...' if item.description and item.description|length > 80 else item.description or '-' }}</td></tr>{% endfor %}</table>{% else %}<p class="empty">None</p>{% endif %}</div>
-        <div class="section"><h2>Gear &amp; Miscellany</h2>{% if gear %}<table><tr><th>Item</th><th class="center" style="width:40px">Qty</th><th>Type</th></tr>{% for item in gear %}<tr><td class="item-name">{{ item.name }}</td><td class="center mono">{{ item.quantity }}</td><td class="item-stats">{{ 'Book' if item.is_book else 'Misc' }}</td></tr>{% endfor %}</table>{% else %}<p class="empty">None</p>{% endif %}</div>
+        <div class="section"><h2>Consumables</h2>
+        {% if consumables %}
+            {% for item in consumables %}
+            <div class="item-block">
+                <span class="item-name">{{ item.name }}</span> <span class="item-stats">(x{{ item.quantity }})</span>
+                {% if item.description %}<div class="item-desc">{{ item.description }}</div>{% endif %}
+            </div>
+            {% endfor %}
+        {% else %}<p class="empty">None</p>{% endif %}
+        </div>
+        <div class="section"><h2>Gear &amp; Miscellany</h2>
+        {% if gear %}
+            {% for item in gear %}
+            <div class="item-block">
+                <span class="item-name">{{ item.name }}</span> <span class="item-stats">(x{{ item.quantity }}) {{ 'Book' if item.is_book else 'Misc' }}</span>
+                {% if item.description %}<div class="item-desc">{{ item.description }}</div>{% endif %}
+            </div>
+            {% endfor %}
+        {% else %}<p class="empty">None</p>{% endif %}
+        </div>
 
         <!-- BIOGRAPHY -->
         {% if biography %}<div class="section"><h2>Data</h2><p>{{ biography }}</p></div>{% endif %}

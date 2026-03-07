@@ -14,18 +14,19 @@ class FalloutSystem(SystemInterface):
         return "Fallout RPG"
 
     def can_handle(self, file_path: Path, data: dict) -> bool:
-        # Relaxed check: Accept any file that has basic Actor structure.
-        # We will let the validation step find the missing attributes.
-        return 'name' in data and 'system' in data
+        system_id = data.get('_stats', {}).get('systemId', '')
+        return 'name' in data and 'system' in data and 'fallout' in system_id.lower()
 
-    def load_character(self, file_path: Path) -> Character:
-        return Character(file_path)
+    def load_character(self, file_path: Path, data: dict = None) -> Character:
+        return Character(file_path, data=data)
 
     def validate(self, character: Character) -> Dict[str, List[str]]:
         validator = CharacterValidator(character)
         validator.run_validation(verbose=False)
         return {
+            # health_warnings are critical issues → mapped to 'errors'
             'errors': validator.health_warnings,
+            # completeness_issues are informational → mapped to 'warnings'
             'warnings': validator.completeness_issues
         }
 
