@@ -502,6 +502,10 @@ athletics = next((item for item in character_data.get('items', [])
 - Check apparel location coverage
 - Confirm body part mapping (armL, armR, head, torso, legL, legR)
 
+## Documentation
+
+Projektdokumentation: Siehe Obsidian Vault [[Fallout Character Management]]
+
 ## System Information
 
 - **Python**: 3.6+ required (tested with 3.11.14)
