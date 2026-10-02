@@ -18,6 +18,11 @@ class Character:
         self.character_file = character_file
         self.data = data if data is not None else self._load_character_data()
 
+        if not isinstance(self.data, dict) or self.data.get('type') not in ('character', 'robot'):
+            raise ValueError("Expected a Foundry character or robot actor export")
+        if not isinstance(self.data.get('system'), dict) or not isinstance(self.data.get('items', []), list):
+            raise ValueError("Character export must contain a system object and an items list")
+
         self.name: str = self.data.get('name', 'Unknown')
         self.type: str = self.data.get('type', 'character')
         self.level: int = self.system.get('level', {}).get('value', 1)

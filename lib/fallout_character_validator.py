@@ -72,15 +72,15 @@ class CharacterValidator:
         if not perks:
             self.completeness_issues.append("No perks")
 
-        # Check equipped weapons (not stashed = equipped)
-        weapons = self.character.get_weapons()
+        # Check the raw items: formatted weapons/apparel no longer carry system state.
+        weapons = self.character.get_items(type_filter=['weapon'])
         equipped_weapons = [w for w in weapons if not w.get('system', {}).get('stashed', False)]
         if weapons and not equipped_weapons:
             self.completeness_issues.append(f"No weapons equipped ({len(weapons)} available)")
 
         # Check equipped apparel (not stashed = equipped)
         if self.character.type != 'robot':
-            apparel = self.character.get_apparel()
+            apparel = self.character.get_items(type_filter=['apparel'])
             equipped_apparel = [a for a in apparel if not a.get('system', {}).get('stashed', False)]
             if apparel and not equipped_apparel:
                 self.completeness_issues.append(f"No apparel equipped ({len(apparel)} available)")
@@ -98,6 +98,8 @@ class CharacterValidator:
         """Run all validation checks."""
         if verbose:
             print(f"Running validation for: {self.character.name}")
+        self.health_warnings.clear()
+        self.completeness_issues.clear()
         self.validate_critical_data()
         self.validate_completeness()
 
@@ -149,14 +151,14 @@ class CharacterValidator:
 def main():
     parser = argparse.ArgumentParser(
         description="Validate FVTT Fallout character JSON exports.",
-        epilog="Example:\n  python -m lib.fallout_validator fvtt_export/character.json"
+        epilog="Example:\n  python -m lib.fallout_character_validator fvtt_export/character.json"
     )
     parser.add_argument('character_file', type=Path, help='Path to FVTT character JSON file')
     args = parser.parse_args()
 
     try:
         # Security: Validate the path before using it
-        safe_file_path = validate_path(args.character_file, base_dir='fvtt_export')
+        safe_file_path = validate_path(args.character_file, base_dir=Path(__file__).resolve().parent.parent / 'fvtt_export')
 
         # Load character using the central library
         character = Character(safe_file_path)

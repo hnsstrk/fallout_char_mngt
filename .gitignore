@@ -8,3 +8,7 @@ character_sheets/*.md
 
 # Python cache files
 __pycache__/
+
+# Local agent configuration and plans
+.claude/
+.hermes/

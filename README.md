@@ -33,6 +33,7 @@ python rpg_sheets.py
 | `H` | Generate HTML sheet |
 | `A` | Generate HTML with skill appendix |
 | `R` | Refresh character list |
+| `O` | Open the last export if it is HTML |
 | `Q` | Quit |
 
 ### Adding Characters
@@ -43,7 +44,19 @@ python rpg_sheets.py
 
 ### Output
 
-Generated sheets are saved to `character_sheets/`. HTML files can be printed to PDF via browser (Ctrl+P).
+Generated sheets are saved to `character_sheets/` next to the script. Their names contain a short key derived from the source filename, so equally named actors do not overwrite each other; HTML with skill appendix has its own `-appendix.html` filename. If a sheet already exists, the TUI asks before replacing it. The saved path remains visible; press `O` to open it if the last export is HTML. For Markdown, use the displayed path. HTML files can then be printed to PDF via your browser's print dialog. Files that fail to load are shown in the list but cannot be generated. Validation health warnings do not prevent export; check the sheet before printing.
+
+### Command line
+
+From the repository root, you can generate a single sheet without the TUI or validate an export:
+
+```bash
+python -m lib.fallout_sheet_generator fvtt_export/fvtt-Actor-marcel-O44zYNGmMfYtSjVw.json --format html
+python -m lib.fallout_character_validator fvtt_export/fvtt-Actor-marcel-O44zYNGmMfYtSjVw.json
+python -m unittest discover -v
+```
+
+The generator also accepts `--format markdown` (the default) and `--appendix` with HTML. Source JSON files must be inside this repository's `fvtt_export/`; generated files are written to its `character_sheets/`. The CLI refuses to replace an existing sheet unless you pass `--replace`. You can pass an absolute path to an export when calling the CLI from another directory.
 
 ## Supported Systems
 
@@ -53,7 +66,7 @@ Generated sheets are saved to `character_sheets/`. HTML files can be printed to 
 
 ## Requirements
 
-- Python 3.6+
+- Python 3.9+
 - Dependencies: `textual`, `jinja2` (via `pip install -r requirements.txt`)
 
 ### Virtual Environment (Recommended)

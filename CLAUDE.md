@@ -4,9 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Generates printable Markdown character sheets from FoundryVTT Fallout TTRPG JSON exports — for offline gameplay without FoundryVTT access.
+Generates printable Markdown and HTML character sheets from FoundryVTT Fallout TTRPG JSON exports — for offline gameplay without FoundryVTT access.
 
-**Tech**: Python 3.6+ (stdlib only), Fallout 2d20 System v11.16.4, FVTT Core v13.x
+**Tech**: Python 3.9+, Textual and Jinja2 (`requirements.txt`), Fallout 2d20 System v11.16.4, FVTT Core v13.x
 
 ## Task Management
 
@@ -17,21 +17,26 @@ task project:fallout_char_mngt list
 ## Commands
 
 ```bash
-# Character sheet generieren
-python generate_character_sheet.py fvtt_export/<character-file>.json
-# Ausgabe: character_sheets/{character_name}.md
+python rpg_sheets.py  # TUI
+python -m lib.fallout_sheet_generator fvtt_export/<character-file>.json --format html
+python -m lib.fallout_sheet_generator fvtt_export/<character-file>.json --format html --appendix
+python -m unittest discover -v
+# CLI replaces existing output only with --replace; TUI asks first.
 ```
 
 ## Repository Structure
 
 ```
 fallout_char_mngt/
-├── fvtt_export/            # FVTT character exports (6 JSON files, 100KB-186KB)
+├── fvtt_export/            # FVTT character exports
 ├── reference_data/
 │   ├── formulas.json       # Validated derived statistics formulas
 │   └── SOURCE.md           # Licensing and attribution
-├── character_sheets/       # Generated Markdown output
-├── generate_character_sheet.py  # Main script (662 lines, CharacterSheetGenerator class)
+├── character_sheets/       # Generated Markdown and HTML output
+├── rpg_sheets.py           # Textual TUI, import, validation and export actions
+├── lib/                    # Character model, validation, naming and generator
+├── templates/              # Printable HTML sheet
+├── tests/                  # unittest workflow checks
 ├── CLAUDE.md
 └── README.md
 ```
@@ -95,13 +100,13 @@ STR = system['attributes']['str']['value']   # Bad — crashes
 - Type hints und Docstrings für alle public methods
 - `Path`-Objekte (nicht strings) für Dateipfade
 - UTF-8 encoding für alle Dateioperationen
-- Single-class design: `CharacterSheetGenerator`
+- Keep UI in `rpg_sheets.py`, shared filename policy in `lib/output_path.py`, generators in `lib/fallout_sheet_generator.py`
 
 ## Pre-Commit Checklist
 
 1. README.md aktualisieren falls: neue CLI-Argumente, neue Output-Sektionen, geänderte Formeln, Phase-Transitions
 2. Generator mit Testcharakter laufen lassen
-3. Beide Dateien zusammen committen
+3. Tests und Dokumentation mit den Implementierungsänderungen committen
 
 ## Documentation
 

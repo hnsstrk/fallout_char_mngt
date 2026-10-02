@@ -14,7 +14,7 @@ from datetime import datetime
 # Import shared library components
 from lib.character_data import Character
 from lib.safe_path import validate_path
-from lib.utils import sanitize_filename
+from lib.output_path import sheet_path, write_sheet
 
 # Optional dependency for HTML output
 try:
@@ -301,6 +301,7 @@ def main():
     parser.add_argument('character_file', type=Path, help='Path to FVTT character JSON file')
     parser.add_argument('--format', '-f', choices=['markdown', 'html'], default='markdown', help='Output format')
     parser.add_argument('--appendix', action='store_true', help='Include appendix with skill descriptions (HTML only)')
+    parser.add_argument('--replace', action='store_true', help='Replace an existing output file (otherwise refuse)')
     args = parser.parse_args()
 
     # Security check for Jinja2
@@ -310,7 +311,7 @@ def main():
 
     try:
         # Security: Validate the path before using it
-        safe_file_path = validate_path(args.character_file, base_dir='fvtt_export')
+        safe_file_path = validate_path(args.character_file, base_dir=Path(__file__).resolve().parent.parent / 'fvtt_export')
 
         # Load character using the central library
         character = Character(safe_file_path)
@@ -320,23 +321,19 @@ def main():
 
         if args.format == 'html':
             sheet_content = generator.generate_html_sheet()
-            extension = 'html'
         else:
             sheet_content = generator.generate_markdown_sheet()
-            extension = 'md'
 
         # Save the output file
-        output_dir = Path('character_sheets')
+        output_dir = Path(__file__).resolve().parent.parent / 'character_sheets'
         output_dir.mkdir(exist_ok=True)
-        safe_name = sanitize_filename(character.name)
-        output_file = output_dir / f"{safe_name}.{extension}"
+        output_file = sheet_path(character, output_dir, args.format, args.appendix)
 
-        with open(output_file, 'w', encoding='utf-8') as f:
-            f.write(sheet_content)
+        write_sheet(output_file, sheet_content, replace=args.replace)
 
         print(f"Successfully generated character sheet: {output_file}")
 
-    except (FileNotFoundError, ValueError) as e:
+    except (FileNotFoundError, FileExistsError, ValueError) as e:
         print(f"Error: {e}", file=sys.stderr)
         sys.exit(1)
     except Exception as e:

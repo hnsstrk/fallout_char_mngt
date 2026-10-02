@@ -14,8 +14,13 @@ class FalloutSystem(SystemInterface):
         return "Fallout RPG"
 
     def can_handle(self, file_path: Path, data: dict) -> bool:
-        system_id = data.get('_stats', {}).get('systemId', '')
-        return 'name' in data and 'system' in data and 'fallout' in system_id.lower()
+        if not isinstance(data, dict):
+            return False
+        stats = data.get('_stats')
+        system_id = stats.get('systemId', '') if isinstance(stats, dict) else ''
+        return (data.get('type') in ('character', 'robot') and 'name' in data
+                and isinstance(data.get('system'), dict) and isinstance(system_id, str)
+                and system_id.lower() == 'fallout')
 
     def load_character(self, file_path: Path, data: dict = None) -> Character:
         return Character(file_path, data=data)

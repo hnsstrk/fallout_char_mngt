@@ -1,6 +1,7 @@
 from pathlib import Path
+from typing import Union
 
-def validate_path(file_path: Path, base_dir: str = 'fvtt_export') -> Path:
+def validate_path(file_path: Path, base_dir: Union[str, Path] = 'fvtt_export') -> Path:
     """
     Validates that the given file path is within the allowed base directory.
 
