@@ -200,6 +200,7 @@
         </div>
 
         <!-- APPAREL -->
+        {% if not is_robot %}
         <div class="section"><h2>Apparel</h2>
         {% if apparel %}<table><tr><th>Item</th><th>Locations</th><th>Resistances</th></tr>
         {% for item in apparel %}
@@ -208,6 +209,7 @@
         {% endfor %}
         </table>{% else %}<p class="empty">None</p>{% endif %}
         </div>
+        {% endif %}
 
         <!-- ROBOT-SPECIFIC SECTIONS -->
         {% if is_robot %}

@@ -44,7 +44,7 @@ python rpg_sheets.py
 
 ### Output
 
-Generated sheets are saved to `character_sheets/` next to the script. Their names contain a short key derived from the source filename, so equally named actors do not overwrite each other; HTML with skill appendix has its own `-appendix.html` filename. If a sheet already exists, the TUI asks before replacing it. The saved path remains visible; press `O` to open it if the last export is HTML. For Markdown, use the displayed path. HTML files can then be printed to PDF via your browser's print dialog. Files that fail to load are shown in the list but cannot be generated. Validation health warnings do not prevent export; check the sheet before printing.
+Generated sheets are saved to `character_sheets/` next to the script. Their names contain a short key derived from the source file's full path, so equally named actors do not overwrite each other; HTML with skill appendix has its own `-appendix.html` filename. If a sheet already exists, the TUI asks before replacing it. The saved path remains visible; press `O` to open it if the last export is HTML. For Markdown, use the displayed path. HTML files can then be printed to PDF via your browser's print dialog. Files that fail to load are shown in the list but cannot be generated. Validation health warnings do not prevent export; check the sheet before printing.
 
 ### Command line
 

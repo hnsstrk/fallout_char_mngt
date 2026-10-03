@@ -2,7 +2,9 @@
 
 import io
 import json
+import os
 import shutil
+import stat
 import tempfile
 import unittest
 from contextlib import redirect_stderr, redirect_stdout
@@ -10,7 +12,10 @@ from pathlib import Path
 from typing import cast
 from unittest.mock import patch
 
+from textual.widgets import Label
+
 from lib.character_data import Character
+from lib.fallout_sheet_generator import CharacterSheetGenerator
 from lib.output_path import sheet_path, write_sheet
 from rpg_sheets import CharacterManagerApp, CharacterListItem, ErrorListItem, ReplaceSheetScreen
 
@@ -42,6 +47,38 @@ class OutputPathTests(unittest.TestCase):
             self.assertFalse(output.is_symlink())
             self.assertEqual(output.read_text(encoding='utf-8'), 'new')
 
+    def test_same_basename_in_different_directories_has_distinct_names(self):
+        actor = {'name': 'Same Name', 'type': 'character', 'system': {}, 'items': []}
+        output = Path('character_sheets')
+        with tempfile.TemporaryDirectory() as temp:
+            first = Character(Path(temp) / 'campaign_a' / 'actor.json', data=actor)
+            second = Character(Path(temp) / 'campaign_b' / 'actor.json', data=actor)
+            self.assertNotEqual(sheet_path(first, output, 'html'), sheet_path(second, output, 'html'))
+
+    def test_relative_and_absolute_source_have_same_name(self):
+        actor = {'name': 'Same Name', 'type': 'character', 'system': {}, 'items': []}
+        output = Path('character_sheets')
+        relative = Character(Path('fvtt_export/actor.json'), data=actor)
+        absolute = Character(Path('fvtt_export/actor.json').resolve(), data=actor)
+        self.assertEqual(sheet_path(relative, output, 'html'), sheet_path(absolute, output, 'html'))
+
+    def test_replace_creates_file_with_umask_permissions(self):
+        previous = os.umask(0o022)
+        try:
+            with tempfile.TemporaryDirectory() as temp:
+                fresh = Path(temp) / 'fresh.html'
+                write_sheet(fresh, 'new', replace=True)
+                self.assertEqual(stat.S_IMODE(fresh.stat().st_mode), 0o644)
+                private = Path(temp) / 'private.html'
+                private.write_text('old', encoding='utf-8')
+                private.chmod(0o600)
+                write_sheet(private, 'new', replace=True)
+                self.assertEqual(stat.S_IMODE(private.stat().st_mode), 0o644)
+                self.assertEqual(sorted(entry.name for entry in Path(temp).iterdir()),
+                                 ['fresh.html', 'private.html'])
+        finally:
+            os.umask(previous)
+
     def test_cli_refuses_replace_without_flag(self):
         from lib import fallout_sheet_generator as generator
         example = next((Path(__file__).resolve().parents[1] / 'fvtt_export').glob('fvtt-Actor-marcel-*.json'))
@@ -59,6 +96,53 @@ class OutputPathTests(unittest.TestCase):
             with patch.object(generator, 'sheet_path', return_value=target), patch('sys.argv', args + ['--replace']):
                 with redirect_stdout(io.StringIO()):
                     generator.main()
+
+
+class RobotSheetTests(unittest.TestCase):
+    def render(self, actor_type):
+        items = [{'name': 'Leather Coat', 'type': 'apparel', 'system': {}}]
+        data = {'name': 'Unit', 'type': actor_type, 'system': {'level': {'value': 1}}, 'items': items}
+        return CharacterSheetGenerator(Character(Path('unused.json'), data=data)).generate_html_sheet()
+
+    def test_robot_html_omits_apparel_section(self):
+        html = self.render('robot')
+        self.assertNotIn('<h2>Apparel</h2>', html)
+        self.assertIn('<h2>Robot Armor</h2>', html)
+
+    def test_character_html_keeps_apparel_section(self):
+        html = self.render('character')
+        self.assertIn('<h2>Apparel</h2>', html)
+        self.assertNotIn('<h2>Robot Armor</h2>', html)
+
+
+class StatusStylingTests(unittest.IsolatedAsyncioTestCase):
+    def make_item(self, validation):
+        info = {'name': 'Test Actor', 'class': 'Lvl 1 Vault Dweller'}
+        return CharacterListItem(info, None, validation, None)
+
+    def test_health_warnings_use_error_icon_and_class(self):
+        item = self.make_item({'errors': ['Max health is 0'], 'warnings': ['No perks']})
+        self.assertEqual((item.status_icon, item.status_class), ('[X]', 'status-error'))
+
+    def test_informational_issues_keep_warning_icon_and_class(self):
+        item = self.make_item({'errors': [], 'warnings': ['No perks']})
+        self.assertEqual((item.status_icon, item.status_class), ('[!]', 'status-warning'))
+
+    async def test_health_warning_label_renders_in_error_color(self):
+        app = CharacterManagerApp()
+        with tempfile.TemporaryDirectory() as temp:
+            with patch('rpg_sheets.PROJECT_ROOT', Path(temp)):
+                async with app.run_test() as pilot:
+                    health = self.make_item({'errors': ['Max health is 0'], 'warnings': []})
+                    note = self.make_item({'errors': [], 'warnings': ['No perks']})
+                    failed = ErrorListItem('bad.json', 'Invalid JSON')
+                    await app.query_one('#sidebar').mount(health, note, failed)
+                    await pilot.pause()
+                    health_label, note_label, failed_label = (
+                        entry.query(Label).first() for entry in (health, note, failed))
+                    self.assertTrue(str(health_label.render()).startswith('[X]'))
+                    self.assertEqual(health_label.styles.color, failed_label.styles.color)
+                    self.assertNotEqual(health_label.styles.color, note_label.styles.color)
 
 
 class ExportUITests(unittest.IsolatedAsyncioTestCase):

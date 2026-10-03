@@ -50,7 +50,10 @@ class CharacterListItem(ListItem):
         warnings = len(validation_results.get('warnings', []))
 
         # Determine status icon/class (using ASCII for terminal compatibility)
-        if errors > 0 or warnings > 0:
+        if errors > 0:
+            self.status_icon = "[X]"
+            self.status_class = "status-error"
+        elif warnings > 0:
             self.status_icon = "[!]"
             self.status_class = "status-warning"
         else:
